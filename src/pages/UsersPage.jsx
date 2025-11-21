@@ -25,7 +25,7 @@ export default function UsersPage() {
     { key: 'user_name', header: 'Name' },
     { key: 'user_email', header: 'Email' },
     { key: 'role', header: 'Role' },
-    { key: 'time_duration', header: 'Time Duration (h)' },
+   // { key: 'time_duration', header: 'Time Duration (h)' },
   ]
 
   const queryKey = useMemo(() => ['users', 'list'], [])
@@ -115,7 +115,12 @@ export default function UsersPage() {
 
   const loading = listQuery.isLoading || createMut.isPending || updateMut.isPending || deleteMut.isPending
   const rawRows = Array.isArray(listQuery.data) ? listQuery.data : listQuery.data?.items || []
-  const rows = rawRows.map((r, i) => ({ ...r, id: r.id || r._id, sno: i + 1 }))
+  const rows = rawRows.map((r, i) => ({ 
+    ...r, 
+    id: r.id || r._id, 
+    sno: i + 1,
+    role: r.role ? r.role.charAt(0).toUpperCase() + r.role.slice(1) : r.role
+  }))
 
   return (
     <div className="space-y-4">
@@ -182,11 +187,14 @@ export default function UsersPage() {
                   className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
-                  {roleOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
+                    <option value="contractor_rep">Contractor</option>
+                    <option value="consultant_rep">Consultant</option>
+                    <option value='inspector' >Inspector</option>
+                    <option value="surveyor">Surveyor</option>
+                    <option value="me" >Material Engineer (ME)</option>
+                    <option value="are">Assistant Resident Engineer (ARE)</option>
+                    <option value="re">Resident Engineer</option>
+                    <option value="admin">Admin</option>
                 </select>
               </div>
 
