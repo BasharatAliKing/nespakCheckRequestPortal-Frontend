@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {toast } from 'react-toastify'
+import {toast, ToastContainer } from 'react-toastify'
 import Table from '../components/Table'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://nespakcheckrequest.cmsurveycell.com/api'
@@ -55,7 +55,7 @@ export default function UsersPage() {
     },
 
     onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('User added successfully!') },
-    onError: handleError
+//    onError: handleError
   })
 
   const updateMut = useMutation({
@@ -69,7 +69,7 @@ export default function UsersPage() {
       return res.json()
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('User updated successfully!') },
-    onError: handleError
+  //  onError: handleError
   })
   const deleteMut = useMutation({
     mutationFn: async (row) => {
@@ -81,7 +81,7 @@ export default function UsersPage() {
       return res.json()
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('User deleted successfully!') },
-    onError: handleError
+  //  onError: handleError
   })
 
   const handleSuccess = (msg) => toast.success(msg)
@@ -147,7 +147,6 @@ export default function UsersPage() {
           Add User
         </button>
       </div>
-
       {listQuery.error && (
         <div className="text-red-600 text-sm">{String(listQuery.error.message || listQuery.error)}</div>
       )}
