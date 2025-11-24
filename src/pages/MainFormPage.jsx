@@ -24,11 +24,11 @@ export default function MainFormPage() {
     boq_item_no: '',
     drawing_ref_no: '',
     contractor_name: '',
-    contractor_status: 'empty',
+    contractor_status: '',
     contractor_submit_date: '',
     contractor_submit_time: '',
     consultant_name: '',
-    consultant_status: 'pending',
+    consultant_status: '',
     consultant_update_date: '',
     consultant_update_time: '',
     inspector_name: '',
@@ -51,7 +51,7 @@ export default function MainFormPage() {
     re_status: '',
     re_update_date: '',
     re_update_time: '',
-  })
+  });
   const [editingId, setEditingId] = useState(null)
   const [viewingRow, setViewingRow] = useState(null)
   const [contractorLogo, setContractorLogo] = useState(null)

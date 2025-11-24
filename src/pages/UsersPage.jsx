@@ -6,9 +6,6 @@ import Table from '../components/Table'
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://nespakcheckrequest.cmsurveycell.com/api'
 
 export default function UsersPage() {
-  const handleSuccess = (msg) => toast.success(msg)
-  const handleError = (err) => toast.error(String(err))
-  
   const qc = useQueryClient()
   const [formOpen, setFormOpen] = useState(false)
   const [formData, setFormData] = useState({ 
@@ -87,6 +84,9 @@ export default function UsersPage() {
     onError: handleError
   })
 
+  const handleSuccess = (msg) => toast.success(msg)
+  const handleError = (err) => toast.error(String(err))
+
   function openCreate() {
     setEditingId(null)
     setFormData({ 
@@ -139,7 +139,7 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-    
+     <ToastContainer position="top-right" autoClose={2000} />
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Users</h2>
