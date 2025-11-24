@@ -68,7 +68,7 @@ export default function MainFormPage() {
     { key: 'sno', header: '#' },
     { key: 'project_name', header: 'Project Name' },
     { key: 'rfi_no', header: 'RFI No' },
-    {key:'contractor_status', header:'Status'}
+   // {key:'contractor_status', header:'Status'}
   //  { key: 'date_of_rfi', header: 'Date of RFI', render: (val) => val ? new Date(val).toLocaleDateString() : '' },
   //  { key: 'previously_requested', header: 'Previously Requested' },
   //  { key: 'previous_rfi_no', header: 'Previous RFI No' },
