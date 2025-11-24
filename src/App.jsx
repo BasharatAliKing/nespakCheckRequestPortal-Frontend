@@ -10,12 +10,13 @@ import ConsultantsPage from './pages/ConsultantsPage.jsx'
 import MainFormPage from './pages/MainFormPage.jsx'
 import ProtectedRoute from './utilities/ProtectedRoute.jsx'
 import AdminRoute from './utilities/AdminRoute.jsx'
-
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 function App() {
   return (
+   <>
     <Routes>
       <Route path="/login" element={<Login />} />
-
       <Route
         path="/"
         element={
@@ -32,9 +33,10 @@ function App() {
         <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
         <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
       </Route>
-
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  <ToastContainer position="top-right" autoClose={2000} />
+   </>
   )
 }
 

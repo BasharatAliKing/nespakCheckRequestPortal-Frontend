@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ToastContainer, toast } from 'react-toastify'
 import Table from '../components/Table'
+import 'react-toastify/dist/ReactToastify.css'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://nespakcheckrequest.cmsurveycell.com/api'
 
@@ -11,6 +13,7 @@ export default function ContractorsPage() {
   const [logoFile, setLogoFile] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [currentLogo, setCurrentLogo] = useState('')
+  const [actionLoading, setActionLoading] = useState('')
 
   const queryKey = useMemo(() => ['contractors', 'list'], [])
 
@@ -48,6 +51,9 @@ export default function ContractorsPage() {
     },
   })
 
+  const handleSuccess = (msg) => toast.success(msg)
+  const handleError = (err) => toast.error(String(err))
+
   const createMut = useMutation({
     mutationFn: async ({ contractor_name, contractor_logo }) => {
       const fd = new FormData()
@@ -60,7 +66,8 @@ export default function ContractorsPage() {
       if (!res.ok) throw new Error('Failed to create contractor')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Contractor added successfully!') },
+    onError: handleError
   })
 
   const updateMut = useMutation({
@@ -75,7 +82,8 @@ export default function ContractorsPage() {
       if (!res.ok) throw new Error('Failed to update contractor')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Contractor updated successfully!') },
+    onError: handleError
   })
 
   const deleteMut = useMutation({
@@ -86,7 +94,8 @@ export default function ContractorsPage() {
       if (!res.ok) throw new Error('Failed to delete contractor')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Contractor deleted successfully!') },
+    onError: handleError
   })
 
   function openCreate() {
@@ -112,10 +121,13 @@ export default function ContractorsPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (editingId) {
+      setActionLoading('updating')
       await updateMut.mutateAsync({ id: editingId, ...formData, contractor_logo: logoFile })
     } else {
+      setActionLoading('adding')
       await createMut.mutateAsync({ ...formData, contractor_logo: logoFile })
     }
+    setActionLoading('')
     setFormOpen(false)
   }
 
@@ -124,6 +136,8 @@ export default function ContractorsPage() {
 
   return (
     <div className="space-y-4">
+      <ToastContainer position="top-right" autoClose={2000} />
+      {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Contractors</h2>
         <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
@@ -135,7 +149,7 @@ export default function ContractorsPage() {
         <div className="text-red-600 text-sm">{String(listQuery.error.message || listQuery.error)}</div>
       )}
 
-      <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={(row) => deleteMut.mutate(row)} />
+      <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={async (row) => { setActionLoading('deleting'); await deleteMut.mutateAsync(row); setActionLoading(''); }} searchKey="contractor_name" searchPlaceholder="Search by contractor name" pageSize={10} />
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4">
@@ -178,8 +192,8 @@ export default function ContractorsPage() {
               <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading}>
-                {editingId ? 'Update' : 'Create'}
+              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+                {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
           </form>

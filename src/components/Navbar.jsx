@@ -2,7 +2,7 @@ import { logout } from '../utilities/auth'
 
 export default function Navbar() {
   return (
-    <header className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg flex items-center justify-between px-6">
+    <header className="h-16 bg-linear-to-r from-blue-600 to-blue-700 shadow-lg flex items-center justify-between px-6">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md">
           <span className="text-blue-600 font-bold text-xl">N</span>

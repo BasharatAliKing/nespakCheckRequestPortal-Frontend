@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Table from '../components/Table'
 import { getToken } from '../utilities/auth'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -56,16 +58,17 @@ export default function MainFormPage() {
   const [consultantLogo, setConsultantLogo] = useState(null)
   const [clientLogo, setClientLogo] = useState(null)
   const [projectDetails, setProjectDetails] = useState(null)
+  const [actionLoading, setActionLoading] = useState('')
   console.log(contractorLogo);
   const authHeaders = () => {
     const token = getToken?.()
     return token ? { Authorization: `Bearer ${token}` } : {}
   }
-
   const columns = [
     { key: 'sno', header: '#' },
     { key: 'project_name', header: 'Project Name' },
     { key: 'rfi_no', header: 'RFI No' },
+    {key:'contractor_status', header:'Status'}
   //  { key: 'date_of_rfi', header: 'Date of RFI', render: (val) => val ? new Date(val).toLocaleDateString() : '' },
   //  { key: 'previously_requested', header: 'Previously Requested' },
   //  { key: 'previous_rfi_no', header: 'Previous RFI No' },
@@ -105,7 +108,6 @@ export default function MainFormPage() {
   //  { key: 're_update_date', header: 'RE Update Date' },
   //  { key: 're_update_time', header: 'RE Update Time' },
   ];
-
   const queryKey = useMemo(() => ['main-form', 'list'], [])
 
   const origin = (() => {
@@ -247,6 +249,9 @@ export default function MainFormPage() {
     enabled: projectsQuery.isSuccess, // Wait for projects to load first
   });
 
+  const handleSuccess = (msg) => toast.success(msg)
+  const handleError = (err) => toast.error(String(err))
+
   const createMut = useMutation({
     mutationFn: async (data) => {
       const res = await fetch(`${API_URL}/main-form`, {
@@ -258,7 +263,8 @@ export default function MainFormPage() {
       if (!res.ok) throw new Error('Failed to create form')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Form added successfully!') },
+    onError: handleError
   })
 
   const updateMut = useMutation({
@@ -272,7 +278,8 @@ export default function MainFormPage() {
       if (!res.ok) throw new Error('Failed to update form')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Form updated successfully!') },
+    onError: handleError
   })
 
   const deleteMut = useMutation({
@@ -285,7 +292,8 @@ export default function MainFormPage() {
       if (!res.ok) throw new Error('Failed to delete form')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Form deleted successfully!') },
+    onError: handleError
   })
 
   function openCreate() {
@@ -414,16 +422,36 @@ export default function MainFormPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (editingId) await updateMut.mutateAsync(formData)
-    else await createMut.mutateAsync(formData)
+    if (editingId) {
+      setActionLoading('updating')
+      await updateMut.mutateAsync(formData)
+    } else {
+      setActionLoading('adding')
+      await createMut.mutateAsync(formData)
+    }
+    setActionLoading('')
     setFormOpen(false)
   }
 
   const loading = listQuery.isLoading || createMut.isPending || updateMut.isPending || deleteMut.isPending
-  const rows = Array.isArray(listQuery.data) ? listQuery.data : []
+  const rows = Array.isArray(listQuery.data) ? listQuery.data.map((r, i) => {
+    let projectName = r.project_name || ''
+    if (r.project_id && projectsQuery.data) {
+      const project = projectsQuery.data.find(p => p.id === r.project_id)
+      if (project) projectName = project.name
+    }
+    return {
+      ...r,
+      id: r.id || r._id,
+      sno: i + 1,
+      project_name: projectName
+    }
+  }) : []
 
   return (
     <div className="space-y-4">
+      <ToastContainer position="top-right" autoClose={2000} />
+      {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Main Form (RFI)</h2>
         <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
@@ -438,27 +466,31 @@ export default function MainFormPage() {
       )}
 
       <div className="overflow-x-auto">
-        <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={(row) => deleteMut.mutate(row)} onView={openView} />
+        <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={async (row) => { setActionLoading('deleting'); await deleteMut.mutateAsync(row); setActionLoading(''); }} onView={openView} searchKey="project_name" searchPlaceholder="Search by project name or RFI No" pageSize={10} />
       </div>
 
       {formOpen && (
-        <div className="fixed inset-0 bg-black/30 grid place-items-center p-4 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="w-full max-w-5xl bg-white border rounded p-6 space-y-6 my-8">
-            <h3 className="text-lg font-medium">{editingId ? 'Edit' : 'Create'} Form</h3>
-
+        <div className="fixed inset-0 bg-black/30 grid place-items-center p-4 z-50">
+          <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white border rounded p-4 space-y-3 overflow-y-auto max-h-[90vh]">
+            <h3 className="text-lg font-medium">{editingId ? 'Update' : 'Create'} Form</h3>
             {/* Basic Information Section */}
             <div className="space-y-4">
               <h4 className="font-semibold text-blue-600 border-b pb-2">Basic Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div className="space-y-1">
                   <label className="text-sm font-medium" htmlFor="project_name">Project Name *</label>
-                  <input
+                  <select
                     id="project_name"
                     value={formData.project_name}
                     onChange={(e) => setFormData((s) => ({ ...s, project_name: e.target.value }))}
                     className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                     required
-                  />
+                  >
+                    <option value="">Select Project</option>
+                    {projectsQuery.data?.map((p) => (
+                      <option key={p.id} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-1">
@@ -939,12 +971,12 @@ export default function MainFormPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <button type="button" className="px-4 py-2 rounded border" onClick={closeForm}>
+            <div className="flex justify-end gap-2 col-span-full">
+              <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white" disabled={loading}>
-                {editingId ? 'Update' : 'Create'}
+              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+                {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
           </form>

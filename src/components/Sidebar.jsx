@@ -20,7 +20,7 @@ export default function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive 
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-105' 
+                  ? 'bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-105' 
                   : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
               }`
             }

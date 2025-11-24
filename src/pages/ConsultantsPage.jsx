@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Table from '../components/Table'
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://nespakcheckrequest.cmsurveycell.com/api'
@@ -11,6 +13,7 @@ export default function ConsultantsPage() {
   const [logoFile, setLogoFile] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [currentLogo, setCurrentLogo] = useState('')
+  const [actionLoading, setActionLoading] = useState('')
 
   const queryKey = useMemo(() => ['consultants', 'list'], [])
 
@@ -48,6 +51,9 @@ export default function ConsultantsPage() {
     },
   })
 
+  const handleSuccess = (msg) => toast.success(msg)
+  const handleError = (err) => toast.error(String(err))
+
   const createMut = useMutation({
     mutationFn: async ({ consultant_name, consultant_logo }) => {
       const fd = new FormData()
@@ -60,7 +66,8 @@ export default function ConsultantsPage() {
       if (!res.ok) throw new Error('Failed to create consultant')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Consultant added successfully!') },
+    onError: handleError
   })
 
   const updateMut = useMutation({
@@ -75,7 +82,8 @@ export default function ConsultantsPage() {
       if (!res.ok) throw new Error('Failed to update consultant')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Consultant updated successfully!') },
+    onError: handleError
   })
 
   const deleteMut = useMutation({
@@ -86,7 +94,8 @@ export default function ConsultantsPage() {
       if (!res.ok) throw new Error('Failed to delete consultant')
       return res.json()
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey }); handleSuccess('Consultant deleted successfully!') },
+    onError: handleError
   })
 
   function openCreate() {
@@ -112,10 +121,13 @@ export default function ConsultantsPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (editingId) {
+      setActionLoading('updating')
       await updateMut.mutateAsync({ id: editingId, ...formData, consultant_logo: logoFile })
     } else {
+      setActionLoading('adding')
       await createMut.mutateAsync({ ...formData, consultant_logo: logoFile })
     }
+    setActionLoading('')
     setFormOpen(false)
   }
 
@@ -124,6 +136,8 @@ export default function ConsultantsPage() {
 
   return (
     <div className="space-y-4">
+      <ToastContainer position="top-right" autoClose={2000} />
+      {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Consultants</h2>
         <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
@@ -135,7 +149,7 @@ export default function ConsultantsPage() {
         <div className="text-red-600 text-sm">{String(listQuery.error.message || listQuery.error)}</div>
       )}
 
-      <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={(row) => deleteMut.mutate(row)} />
+      <Table columns={columns} rows={rows} onEdit={openEdit} onDelete={async (row) => { setActionLoading('deleting'); await deleteMut.mutateAsync(row); setActionLoading(''); }} searchKey="consultant_name" searchPlaceholder="Search by consultant name" pageSize={10} />
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4">
@@ -178,8 +192,8 @@ export default function ConsultantsPage() {
               <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading}>
-                {editingId ? 'Update' : 'Create'}
+              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+                {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
           </form>
