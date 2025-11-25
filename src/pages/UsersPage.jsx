@@ -203,6 +203,7 @@ export default function UsersPage() {
                   className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
+                  <option value="">Select Role</option>
                     <option value="contractor_rep">Contractor</option>
                     <option value="consultant_rep">Consultant</option>
                     <option value='inspector' >Inspector</option>

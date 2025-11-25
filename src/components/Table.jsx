@@ -81,7 +81,7 @@ export default function Table({ columns, rows, onEdit, onDelete, onView, searchK
           {paginatedRows.map((row, idx) => (
             <tr key={row.id} className={`transition-colors hover:bg-blue-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
               {columns.map((col) => (
-                <td key={col.key} className="capitalize px-4 py-3 border-b border-gray-100 text-gray-700">
+                <td key={col.key} className="px-4 py-3 border-b border-gray-100 text-gray-700">
                   {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '')}
                 </td>
               ))}
