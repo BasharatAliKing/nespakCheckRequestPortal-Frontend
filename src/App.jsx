@@ -12,33 +12,47 @@ import ProtectedRoute from './utilities/ProtectedRoute.jsx'
 import AdminRoute from './utilities/AdminRoute.jsx'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import KpisPage from './pages/KpisPage.jsx'
+import { isAuthenticated, getUserRole } from './utilities/auth.js'
+
 function App() {
+  const role = getUserRole();
+
   return (
-   <>
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="users" replace />} />
-        <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
-        <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
-        <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />
-        <Route path="projects" element={<AdminRoute><ProjectsPage /></AdminRoute>} />
-        <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
-        <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  <ToastContainer position="top-right" autoClose={2000} />
-   </>
-  )
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+
+        {/* If role = admin */}
+        {role === 'admin' ? (
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="users" replace />} />
+            <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
+            <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
+            <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />
+            <Route path="projects" element={<AdminRoute><ProjectsPage /></AdminRoute>} />
+            <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
+            <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
+          </Route>
+        ) : (
+          // If role is not admin → show KPIs page
+          <Route path="/" element={<KpisPage />} />
+        )}
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      <ToastContainer position="top-right" autoClose={2000} />
+    </>
+  );
 }
 
-
-export default App
+export default App;

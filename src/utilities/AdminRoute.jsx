@@ -7,7 +7,6 @@ export default function AdminRoute({ children }) {
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace state={{ from: location }} />
   }
-  
   const role = getUserRole()
   if (role !== 'admin') {
     return <Navigate to="/" replace />
