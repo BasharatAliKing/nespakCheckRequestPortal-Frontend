@@ -140,7 +140,7 @@ export default function ClientsPage() {
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Clients</h2>
-        <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
+        <button className="px-3 py-1 text-sm cursor-pointer md:text-base font-medium rounded bg-blue-600 hover:bg-blue-700 text-white" onClick={openCreate}>
           Add Client
         </button>
       </div>
@@ -153,7 +153,7 @@ export default function ClientsPage() {
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4">
-          <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white border rounded p-4 space-y-3">
+          <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white rounded p-4 space-y-3">
             <h3 className="text-lg font-medium">{editingId ? 'Edit' : 'Create'} Client</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1 md:col-span-2">
@@ -174,7 +174,7 @@ export default function ClientsPage() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
-                  className="w-full border rounded px-3 py-2 file:mr-3 file:px-3 file:py-2 file:border file:rounded"
+                  className="w-full border cursor-pointer outline-none rounded px-3 py-2 file:mr-3 file:px-3 file:py-2 file:border file:rounded"
                 />
                 {(logoFile || currentLogo) && (
                   <div className="mt-2 flex items-center gap-3">
@@ -189,10 +189,10 @@ export default function ClientsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
+              <button type="button" className="px-3 py-1 text-sm cursor-pointer md:text-base font-medium rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+              <button type="submit" className="px-3 py-1 text-sm cursor-pointer md:text-base font-medium rounded bg-blue-600 hover:bg-blue-700 text-white" disabled={loading || actionLoading}>
                 {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>

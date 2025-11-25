@@ -454,11 +454,10 @@ export default function MainFormPage() {
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Main Form (RFI)</h2>
-        <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
+        <button className="px-3 py-1 text-sm md:text-base cursor-pointer rounded bg-blue-600 text-white" onClick={openCreate}>
           Add New Form
         </button>
       </div>
-
       {listQuery.error && (
         <div className="text-red-600 text-sm">
           {String(listQuery.error?.message)}
@@ -471,7 +470,7 @@ export default function MainFormPage() {
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4 z-50">
-          <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white border rounded p-4 space-y-3 overflow-y-auto max-h-[90vh]">
+          <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white shadow-md rounded p-4 space-y-3 overflow-y-auto max-h-[90vh]">
             <h3 className="text-lg font-medium">{editingId ? 'Update' : 'Create'} Form</h3>
             {/* Basic Information Section */}
             <div className="space-y-4">
@@ -972,10 +971,10 @@ export default function MainFormPage() {
             </div>
 
             <div className="flex justify-end gap-2 col-span-full">
-              <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
+              <button type="button" className="px-3 py-1 text-sm md:text-base cursor-pointer rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+              <button type="submit" className="px-3 py-1 text-sm md:text-base cursor-pointer rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
                 {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
@@ -994,13 +993,13 @@ export default function MainFormPage() {
                 <div className="flex gap-2">
                   <button 
                     onClick={handlePrint}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-1 bg-blue-600 cursor-pointer font-medium text-white rounded hover:bg-blue-700"
                   >
                     Print PDF
                   </button>
                   <button 
                     onClick={closeView}
-                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                    className="px-4 py-1 border cursor-pointer font-medium text-gray-700 rounded hover:bg-gray-100"
                   >
                     Close
                   </button>

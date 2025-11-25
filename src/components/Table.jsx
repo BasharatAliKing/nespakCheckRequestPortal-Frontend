@@ -49,19 +49,19 @@ export default function Table({ columns, rows, onEdit, onDelete, onView, searchK
             value={search}
             onChange={handleSearch}
             placeholder={searchPlaceholder}
-            className="border rounded px-3 py-2 w-64 focus:ring-2 focus:ring-blue-500"
+            className="border outline-none text-sm border-[#12121242] rounded px-3 py-2 w-64 focus:ring-2 focus:ring-blue-500"
           />
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center  gap-2">
           <label htmlFor="page-size" className="text-sm text-gray-700">Rows per page:</label>
           <select
             id="page-size"
             value={currentPageSize}
             onChange={handlePageSizeChange}
-            className="border rounded px-2 py-1"
+            className="border cursor-pointer outline-none shadow-md border-[#12121242] min-w-[100px] rounded px-2 py-1"
           >
             {PAGE_SIZE_OPTIONS.map(size => (
-              <option key={size} value={size}>{size}</option>
+              <option key={size} className='border-none outline-none' value={size}>{size}</option>
             ))}
           </select>
         </div>
@@ -89,17 +89,17 @@ export default function Table({ columns, rows, onEdit, onDelete, onView, searchK
                 <td className="px-4 py-3 border-b border-gray-100">
                   <div className="flex gap-2">
                     {onView && (
-                      <button className="px-3 py-1.5 rounded-lg bg-linear-to-r from-green-500 to-green-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onView(row)}>
+                      <button className="px-3 py-1.5 cursor-pointer rounded-lg bg-linear-to-r from-green-500 to-green-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onView(row)}>
                         View/Print
                       </button>
                     )}
                     {onEdit && (
-                      <button className="px-3 py-1.5 rounded-lg bg-linear-to-r from-blue-500 to-blue-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onEdit(row)}>
+                      <button className="px-3 py-1.5 cursor-pointer rounded-lg bg-linear-to-r from-blue-500 to-blue-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onEdit(row)}>
                         Edit
                       </button>
                     )}
                     {onDelete && (
-                      <button className="px-3 py-1.5 rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onDelete(row)}>
+                      <button className="px-3 py-1.5 cursor-pointer rounded-lg bg-linear-to-r from-red-500 to-red-600 text-white text-xs font-medium hover:shadow-lg hover:scale-105 transition-all duration-200" onClick={() => onDelete(row)}>
                         Delete
                       </button>
                     )}

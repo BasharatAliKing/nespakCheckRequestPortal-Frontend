@@ -194,7 +194,7 @@ export default function ProjectsPage() {
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Projects</h2>
-        <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
+        <button className="px-3 py-1 text-sm md:text-base cursor-pointer font-medium rounded bg-blue-600 text-white" onClick={openCreate}>
           Add Project
         </button>
       </div>
@@ -209,7 +209,7 @@ export default function ProjectsPage() {
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4">
-          <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white border rounded p-4 space-y-3">
+          <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white rounded p-4 space-y-3">
             <h3 className="text-lg font-medium">{editingId ? 'Edit' : 'Create'} Project</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -218,7 +218,7 @@ export default function ProjectsPage() {
                   id="project_job_no"
                   value={formData.project_job_no}
                   onChange={(e) => setFormData((s) => ({ ...s, project_job_no: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-2 text-sm md:text-base outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -229,7 +229,7 @@ export default function ProjectsPage() {
                   id="project_title"
                   value={formData.project_title}
                   onChange={(e) => setFormData((s) => ({ ...s, project_title: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-2 text-sm md:text-base outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -240,7 +240,7 @@ export default function ProjectsPage() {
                   id="project_client"
                   value={formData.project_client}
                   onChange={(e) => setFormData((s) => ({ ...s, project_client: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-2 text-sm md:text-base outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="" disabled>Select client</option>
@@ -256,7 +256,7 @@ export default function ProjectsPage() {
                   id="project_contractor"
                   value={formData.project_contractor}
                   onChange={(e) => setFormData((s) => ({ ...s, project_contractor: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-2 text-sm md:text-base outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="" disabled>Select contractor</option>
@@ -272,7 +272,7 @@ export default function ProjectsPage() {
                   id="project_consultant"
                   value={formData.project_consultant}
                   onChange={(e) => setFormData((s) => ({ ...s, project_consultant: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-2 text-sm md:text-base outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="" disabled>Select consultant</option>
@@ -283,10 +283,10 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
+              <button type="button" className="px-3 py-1 text-sm md:text-base cursor-pointer rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+              <button type="submit" className="px-3 py-1 text-sm md:text-base cursor-pointer rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
                 {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>

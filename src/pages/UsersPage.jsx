@@ -143,7 +143,7 @@ export default function UsersPage() {
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Users</h2>
-        <button className="px-3 py-2 rounded bg-blue-600 text-white" onClick={openCreate}>
+        <button className="px-3 cursor-pointer py-1 text-sm md:text-base font-medium rounded bg-blue-600 text-white" onClick={openCreate}>
           Add User
         </button>
       </div>
@@ -155,7 +155,7 @@ export default function UsersPage() {
 
       {formOpen && (
         <div className="fixed inset-0 bg-black/30 grid place-items-center p-4">
-          <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white border rounded p-4 space-y-3">
+          <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white rounded p-4 space-y-3">
             <h3 className="text-lg font-medium">{editingId ? 'Edit' : 'Create'} User</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -165,7 +165,7 @@ export default function UsersPage() {
                   type="text"
                   value={formData.user_name}
                   onChange={(e) => setFormData((s) => ({ ...s, user_name: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -177,7 +177,7 @@ export default function UsersPage() {
                   type="email"
                   value={formData.user_email}
                   onChange={(e) => setFormData((s) => ({ ...s, user_email: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -189,7 +189,7 @@ export default function UsersPage() {
                   type="password"
                   value={formData.user_password}
                   onChange={(e) => setFormData((s) => ({ ...s, user_password: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   required={!editingId}
                 />
               </div>
@@ -200,7 +200,7 @@ export default function UsersPage() {
                   id="role"
                   value={formData.role}
                   onChange={(e) => setFormData((s) => ({ ...s, role: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                     <option value="contractor_rep">Contractor</option>
@@ -220,7 +220,7 @@ export default function UsersPage() {
                   id="time_duration"
                   value={formData.time_duration}
                   onChange={(e) => setFormData((s) => ({ ...s, time_duration: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {timeOptions.map((hour) => (
                     <option key={hour} value={hour}>
@@ -231,10 +231,10 @@ export default function UsersPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button type="button" className="px-3 py-2 rounded border" onClick={closeForm}>
+              <button type="button" className="px-3 cursor-pointer py-1 text-sm rounded border" onClick={closeForm}>
                 Cancel
               </button>
-              <button type="submit" className="px-3 py-2 rounded bg-blue-600 text-white" disabled={loading || actionLoading}>
+              <button type="submit" className="px-3 cursor-pointer py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" disabled={loading || actionLoading}>
                 {actionLoading === 'adding' ? 'Adding...' : actionLoading === 'updating' ? 'Updating...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
