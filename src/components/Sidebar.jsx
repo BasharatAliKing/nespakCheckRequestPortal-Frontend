@@ -5,10 +5,9 @@ const links = [
   { to: '/clients', label: 'Clients', icon: '🏢' },
   { to: '/contractors', label: 'Contractors', icon: '🔨' },
   { to: '/consultants', label: 'Consultants', icon: '💼' },
-  { to: '/projects', label: 'Projects', icon: '📁' },
+  { to: '/projects', label: 'Projects', icon: '🗂️' },
   { to: '/main-form', label: 'Main Form', icon: '📋' },
-]
-
+];
 export default function Sidebar() {
   return (
     <aside className="w-64 bg-white h-[calc(100vh-4rem)] p-4 shadow-lg border-r border-gray-100">

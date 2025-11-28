@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import KpisCard from "../components/KpisCard";
-import { getToken,getUserData } from "../utilities/auth";
+import { getToken, getUserData } from "../utilities/auth";
 import { toast } from "react-toastify";
 import { IoCloseCircleOutline } from "react-icons/io5";
 
@@ -9,6 +9,8 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 const KpisPage = () => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
+  const [kpiData, setKpiData] = useState([]);
+  console.log(kpiData);
   const [showContractorForm, setShowContractorForm] = useState(false);
   // Form state
   const [formDate, setFormDate] = useState({
@@ -24,11 +26,10 @@ const KpisPage = () => {
     bill_no: "",
     boq_item_no: "",
     drawing_ref_no: "",
-    contractor_name: `${getUserData()?.user_name || ''}`,
+    contractor_name: `${getUserData()?.user_name || ""}`,
     contractor_submit_date: "",
     contractor_submit_time: "",
   });
-  console.log(formDate);
   // Generate RFI number based on project and today's date
   const makeRfiNo = (projectId) => {
     const date = new Date();
@@ -36,15 +37,19 @@ const KpisPage = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
     const todayStr = `${year}-${month}-${day}`;
-
     const filteredForms = listMainForm.filter((form) => {
       const projectMatch = form.project_id === projectId;
-      const formDateStr = form.date_of_rfi ? form.date_of_rfi.split("T")[0] : "";
+      const formDateStr = form.date_of_rfi
+        ? form.date_of_rfi.split("T")[0]
+        : "";
       const dateMatch = formDateStr === todayStr;
       return projectMatch && dateMatch;
     });
 
-    return `${year}${month}${day}-${String(filteredForms.length + 1).padStart(2, "0")}`;
+    return `${year}${month}${day}-${String(filteredForms.length + 1).padStart(
+      2,
+      "0"
+    )}`;
   };
 
   // Handle project selection
@@ -61,7 +66,6 @@ const KpisPage = () => {
   const handleRfiFormOpen = (val) => {
     setShowContractorForm(val);
   };
-
   // Fetch main form
   const mainForm = async () => {
     try {
@@ -76,7 +80,6 @@ const KpisPage = () => {
       console.log(err);
     }
   };
-
   // Fetch projects
   const fetchProjects = async () => {
     try {
@@ -91,11 +94,25 @@ const KpisPage = () => {
       console.log(err);
     }
   };
-
+  const getKpisData = async () => {
+    try {
+      const res = await fetch(`${API_URL}/main-form/contractorkpis/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error("Failed to fetch KPI data");
+      setKpiData(data.kpiData || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-      // Get current date and time
+    // Get current date and time
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -104,7 +121,7 @@ const KpisPage = () => {
     const min = String(now.getMinutes()).padStart(2, "0");
 
     const submitDate = `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
-    const submitTime = `${hh}:${min}`;        // HH:MM in 24-hour format
+    const submitTime = `${hh}:${min}`; // HH:MM in 24-hour format
 
     const formDataWithDate = {
       ...formDate,
@@ -122,37 +139,47 @@ const KpisPage = () => {
       });
       const data = await res.json();
       if (!res.ok) toast.error(data.message || "Failed to submit RFI form");
-      else toast.success("RFI form submitted successfully");
-      setShowContractorForm(false);
-      setFormDate({
-        project_id: "",
-        rfi_no: "",
-        date_of_rfi: "",
-        previously_requested: "",
-        previous_rfi_no: "",
-        date_of_inspection: "",
-        time_of_inspection: "",
-        location: "",
-        type_of_activity: "",
-        bill_no: "",
-        boq_item_no: "",
-        drawing_ref_no: "",
-        contractor_name: `${getUserData()?.user_name || ''}`,
-        contractor_submit_date: "",
-        contractor_submit_time: "",
-      })
+      else {
+        toast.success("RFI form submitted successfully");
+        setShowContractorForm(false);
+        setFormDate({
+          project_id: "",
+          rfi_no: "",
+          date_of_rfi: "",
+          previously_requested: "",
+          previous_rfi_no: "",
+          date_of_inspection: "",
+          time_of_inspection: "",
+          location: "",
+          type_of_activity: "",
+          bill_no: "",
+          boq_item_no: "",
+          drawing_ref_no: "",
+          contractor_name: `${getUserData()?.user_name || ""}`,
+          contractor_submit_date: "",
+          contractor_submit_time: "",
+        });
+      }
     } catch (err) {
       console.log(err);
     }
   };
 
   useEffect(() => {
+  }, []);
+  useEffect(() => {
     fetchProjects();
+    getKpisData();
     mainForm();
   }, [formDate]);
+
   return (
     <div className="md:w-1/4 h-screen flex items-center mx-auto">
-      <KpisCard handleRfiFormOpen={handleRfiFormOpen} />
+      <KpisCard
+        kpiscontractor={kpiData.constractor}
+        value="contractor"
+        handleRfiFormOpen={handleRfiFormOpen}
+      />
       {showContractorForm && (
         <div className="fixed inset-0 bg-[#a7a6ba] grid place-items-center p-4">
           <form
@@ -181,7 +208,7 @@ const KpisPage = () => {
                   ))}
                 </select>
               </div>
-
+              
               {/* RFI No */}
               <div className="space-y-1">
                 <label className="text-sm">RFI No</label>
@@ -213,7 +240,10 @@ const KpisPage = () => {
                 <label className="text-sm">Previously Requested</label>
                 <div className="flex gap-5 mt-2">
                   {["yes", "no"].map((val) => (
-                    <label key={val} className="flex gap-1 font-medium text-sm items-center">
+                    <label
+                      key={val}
+                      className="flex gap-1 font-medium text-sm items-center"
+                    >
                       <input
                         type="radio"
                         name="previously_requested"
@@ -240,7 +270,10 @@ const KpisPage = () => {
                     type="text"
                     value={formDate.previous_rfi_no}
                     onChange={(e) =>
-                      setFormDate((s) => ({ ...s, previous_rfi_no: e.target.value }))
+                      setFormDate((s) => ({
+                        ...s,
+                        previous_rfi_no: e.target.value,
+                      }))
                     }
                     className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -254,7 +287,10 @@ const KpisPage = () => {
                   type="date"
                   value={formDate.date_of_inspection}
                   onChange={(e) =>
-                    setFormDate((s) => ({ ...s, date_of_inspection: e.target.value }))
+                    setFormDate((s) => ({
+                      ...s,
+                      date_of_inspection: e.target.value,
+                    }))
                   }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -267,7 +303,10 @@ const KpisPage = () => {
                   type="time"
                   value={formDate.time_of_inspection}
                   onChange={(e) =>
-                    setFormDate((s) => ({ ...s, time_of_inspection: e.target.value }))
+                    setFormDate((s) => ({
+                      ...s,
+                      time_of_inspection: e.target.value,
+                    }))
                   }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -279,7 +318,9 @@ const KpisPage = () => {
                 <input
                   type="text"
                   value={formDate.location}
-                  onChange={(e) => setFormDate((s) => ({ ...s, location: e.target.value }))}
+                  onChange={(e) =>
+                    setFormDate((s) => ({ ...s, location: e.target.value }))
+                  }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -290,7 +331,12 @@ const KpisPage = () => {
                 <input
                   type="text"
                   value={formDate.type_of_activity}
-                  onChange={(e) => setFormDate((s) => ({ ...s, type_of_activity: e.target.value }))}
+                  onChange={(e) =>
+                    setFormDate((s) => ({
+                      ...s,
+                      type_of_activity: e.target.value,
+                    }))
+                  }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -301,7 +347,9 @@ const KpisPage = () => {
                 <input
                   type="text"
                   value={formDate.bill_no}
-                  onChange={(e) => setFormDate((s) => ({ ...s, bill_no: e.target.value }))}
+                  onChange={(e) =>
+                    setFormDate((s) => ({ ...s, bill_no: e.target.value }))
+                  }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -312,7 +360,9 @@ const KpisPage = () => {
                 <input
                   type="text"
                   value={formDate.boq_item_no}
-                  onChange={(e) => setFormDate((s) => ({ ...s, boq_item_no: e.target.value }))}
+                  onChange={(e) =>
+                    setFormDate((s) => ({ ...s, boq_item_no: e.target.value }))
+                  }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -323,7 +373,12 @@ const KpisPage = () => {
                 <input
                   type="text"
                   value={formDate.drawing_ref_no}
-                  onChange={(e) => setFormDate((s) => ({ ...s, drawing_ref_no: e.target.value }))}
+                  onChange={(e) =>
+                    setFormDate((s) => ({
+                      ...s,
+                      drawing_ref_no: e.target.value,
+                    }))
+                  }
                   className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
