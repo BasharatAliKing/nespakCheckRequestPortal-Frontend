@@ -3,14 +3,14 @@ import KpisCard from "../components/KpisCard";
 import { getToken, getUserData } from "../utilities/auth";
 import { toast } from "react-toastify";
 import { IoCloseCircleOutline } from "react-icons/io5";
-
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const KpisPage = () => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
   const [kpiData, setKpiData] = useState([]);
-  console.log(kpiData);
+  const [projects, setProjects] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
   const [showContractorForm, setShowContractorForm] = useState(false);
   // Form state
   const [formDate, setFormDate] = useState({
@@ -96,7 +96,7 @@ const KpisPage = () => {
   };
   const getKpisData = async () => {
     try {
-      const res = await fetch(`${API_URL}/main-form/contractorkpis/`, {
+      const res = await fetch(`${API_URL}/main-form/contractorkpis/${selectedOption===null? "" :`${selectedOption?.value}`}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -171,13 +171,16 @@ const KpisPage = () => {
     fetchProjects();
     getKpisData();
     mainForm();
-  }, [formDate]);
+  }, [formDate, selectedOption]);
 
   return (
     <div className="md:w-1/4 h-screen flex items-center mx-auto">
       <KpisCard
         kpiscontractor={kpiData.constractor}
         value="contractor"
+        projects={listProjects}
+        option={selectedOption}
+        setOption={setSelectedOption}
         handleRfiFormOpen={handleRfiFormOpen}
       />
       {showContractorForm && (
