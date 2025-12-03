@@ -48,7 +48,7 @@ const KpisCard = ({
       const data = await res.json();
       console.log(data);
       setStatusData(data.data);
-    } catch (err) {
+    }catch(err){
       console.log(err);
     }
   };
