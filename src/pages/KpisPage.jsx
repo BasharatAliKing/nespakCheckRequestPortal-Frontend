@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import KpisCard from "../components/KpisCard";
-import { getToken, getUserData } from "../utilities/auth";
+import { getToken, getUserData , logout} from "../utilities/auth";
 import { toast } from "react-toastify";
 import { IoCloseCircleOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const KpisPage = () => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
   const [kpiData, setKpiData] = useState([]);
+  console.log(kpiData);
   const [projects, setProjects] = useState([]);
     const [selectedOption, setSelectedOption] = useState(null);
   const [showContractorForm, setShowContractorForm] = useState(false);
@@ -30,6 +32,8 @@ const KpisPage = () => {
     contractor_submit_date: "",
     contractor_submit_time: "",
   });
+  const userRole=getUserData()?.role || '';
+  console.log(userRole);
   // Generate RFI number based on project and today's date
   const makeRfiNo = (projectId) => {
     const date = new Date();
@@ -61,7 +65,6 @@ const KpisPage = () => {
       rfi_no: makeRfiNo(projectId),
     }));
   };
-
   // Toggle Contractor Form
   const handleRfiFormOpen = (val) => {
     setShowContractorForm(val);
@@ -164,7 +167,6 @@ const KpisPage = () => {
       console.log(err);
     }
   };
-
   useEffect(() => {
   }, []);
   useEffect(() => {
@@ -172,9 +174,12 @@ const KpisPage = () => {
     getKpisData();
     mainForm();
   }, [formDate, selectedOption]);
-
   return (
-    <div className="md:w-1/4 h-screen flex items-center mx-auto">
+ <>
+    <Link to="/login" onClick={()=> logout()} className="absolute top-5 right-5 bg-red-500 p-3 py-1 rounded-md text-white font-medium text-sm cursor-pointer " >Logged Out</Link>
+    <div className="md:w-1/4 h-screen flex items-center mx-auto ">
+    {
+      userRole === 'contractor_rep' ?
       <KpisCard
         kpiscontractor={kpiData.constractor}
         value="contractor"
@@ -183,6 +188,18 @@ const KpisPage = () => {
         setOption={setSelectedOption}
         handleRfiFormOpen={handleRfiFormOpen}
       />
+    : userRole ==='consultant_rep' ?
+     <KpisCard
+        kpiscontractor={kpiData.consultant}
+        value="contractor"
+        projects={listProjects}
+        option={selectedOption}
+        setOption={setSelectedOption}
+        handleRfiFormOpen={handleRfiFormOpen}
+      />
+    :
+     null
+    }
       {showContractorForm && (
         <div className="fixed inset-0 bg-[#a7a6ba] grid place-items-center p-4">
           <form
@@ -397,6 +414,8 @@ const KpisPage = () => {
         </div>
       )}
     </div>
+ </>
+ 
   );
 };
 

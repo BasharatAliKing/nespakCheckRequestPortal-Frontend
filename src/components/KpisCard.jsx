@@ -27,9 +27,6 @@ const KpisCard = ({
   ];
   const userRole = getUserData()?.role;
   const role = userRole?.replace("_rep", "");
-  console.log(statusData);
-  console.log(`${API_URL}/main-form/status/${role}/${selectedBox}/${option?.value || ""}`);
-  console.log("Option" + option?.value);
   const getTableData = async () => {
     try {
       const res = await fetch(option?.value
@@ -81,12 +78,15 @@ const KpisCard = ({
               className="cursor-pointer bg-green-500 flex flex-col relative col-span-2 p-2 rounded-md  text-white"
             >
               <h1 className="text-3xl font-medium">
-                {kpiscontractor?.total_request || 0}
+                { role ==='contractor' ? kpiscontractor?.total_request : kpiscontractor?.consultant_total || 0}
               </h1>
               <p className="text-sm">Total Requests</p>
               <CiFileOn className="absolute text-5xl text-white right-2 top-0 h-full" />
             </div>
-            <div
+           {
+            role === 'contractor' ?(
+              <>
+               <div
               onClick={() => {
                 setSelectedBox("pending");
                 setShowContractorForm(true);
@@ -155,6 +155,78 @@ const KpisCard = ({
               {" "}
               <IoMdAdd className="absolute text-2xl bg-green-500 text-white right-3 bottom-3 rounded-md p-[2px] h-7 w-7 cursor-pointer" />
             </div>
+              </>
+            ):(
+              <>
+               <div
+              onClick={() => {
+                setSelectedBox("pending");
+                setShowContractorForm(true);
+              }}
+              className="cursor-pointer bg-green-900 flex flex-col relative p-2 rounded-md text-white"
+            >
+              <h1 className="text-3xl font-medium">
+                {kpiscontractor?.consultant_pending || 0}
+              </h1>
+              <p className="text-sm">Pending</p>
+              <CiFileOn className="absolute text-3xl text-white right-2 top-0 h-full" />
+            </div>
+               <div
+              onClick={() => {
+                setSelectedBox("pending");
+                setShowContractorForm(true);
+              }}
+              className="cursor-pointer bg-yellow-600 flex flex-col relative p-2 rounded-md text-white"
+            >
+              <h1 className="text-3xl font-medium">
+                {kpiscontractor?.consultant_received_from_contractor || 0}
+              </h1>
+              <p className="text-sm">Received Contractor</p>
+              <CiFileOn className="absolute text-3xl text-white right-2 top-0 h-full" />
+            </div>
+               <div
+              onClick={() => {
+                setSelectedBox("pending");
+                setShowContractorForm(true);
+              }}
+              className="cursor-pointer bg-pink-900 flex flex-col relative p-2 rounded-md text-white"
+            >
+              <h1 className="text-3xl font-medium">
+                {kpiscontractor?.consultant_send_to_contractor || 0}
+              </h1>
+              <p className="text-sm">Sent To Contractor</p>
+              <CiFileOn className="absolute text-3xl text-white right-2 top-0 h-full" />
+            </div>
+          
+               <div
+              onClick={() => {
+                setSelectedBox("pending");
+                setShowContractorForm(true);
+              }}
+              className="cursor-pointer bg-purple-700 flex flex-col relative p-2 rounded-md text-white"
+            >
+              <h1 className="text-3xl font-medium">
+                {kpiscontractor?.consultant_received_from_re || 0}
+              </h1>
+              <p className="text-sm">Received from RE</p>
+              <CiFileOn className="absolute text-3xl text-white right-2 top-0 h-full" />
+            </div>
+               <div
+              onClick={() => {
+                setSelectedBox("expired");
+                setShowContractorForm(true);
+              }}
+              className="cursor-pointer bg-red-600 flex flex-col relative p-2 rounded-md text-white"
+            >
+              <h1 className="text-3xl font-medium">
+                {kpiscontractor?.consultant_expired || 0}
+              </h1>
+              <p className="text-sm">Expired</p>
+              <CiFileOn className="absolute text-3xl text-white right-2 top-0 h-full" />
+            </div>
+            </>
+            )
+           }
           </>
         ) : null}
       </div>
@@ -174,6 +246,9 @@ const KpisCard = ({
             <table className="min-w-full border border-gray-300 rounded-lg">
               <thead>
                 <tr className="bg-gray-100 border-b">
+                  <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                    #
+                  </th>
                   <th className="px-4 py-2 text-left font-semibold text-gray-700">
                     RFI No.
                   </th>
@@ -195,6 +270,7 @@ const KpisCard = ({
   ) : (
     statusData.map((item, index) => (
       <tr key={index} className="border-b hover:bg-gray-50">
+        <td className="px-4 py-2">{index +1}</td>
         <td className="px-4 py-2">{item.rfi_no || "No RFI No"}</td>
 
         <td className="px-4 py-2">
