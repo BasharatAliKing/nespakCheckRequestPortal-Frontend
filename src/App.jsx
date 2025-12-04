@@ -14,6 +14,8 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import KpisPage from './pages/KpisPage.jsx'
 import { isAuthenticated, getUserRole } from './utilities/auth.js'
+import Dashboard from './pages/Dashboard.jsx'
+import TotalRequests from './pages/contractor/TotalRequests.jsx'
 
 function App() {
   const role = getUserRole();
@@ -25,19 +27,19 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              {role === 'admin' ? (
+              {role  ? (
                 <DashboardLayout />
-              ) : role ? (
-                <KpisPage />
-              ) : (
+              ): (
                 <Navigate to="/login" replace />
               )}
             </ProtectedRoute>
           }
         >
-          {role === 'admin' && (
+          {role  ? (
             <>
-              <Route index element={<Navigate to="users" replace />} />
+              <Route index element={<Navigate to="home" replace />} />
+              <Route path="home" element={<Dashboard />} />
+              <Route path='/:type/:status' element={<TotalRequests />} />
               <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
               <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
               <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />
@@ -45,7 +47,10 @@ function App() {
               <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
               <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
             </>
-          )}
+          )
+       :
+         null
+        }
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -53,5 +58,4 @@ function App() {
     </>
   );
 }
-
 export default App;

@@ -31,7 +31,6 @@ export function clearToken() {
 export function isAuthenticated() {
   return Boolean(getToken())
 }
-
 export function authHeader() {
   const token = getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}

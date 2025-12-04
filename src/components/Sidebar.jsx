@@ -1,13 +1,55 @@
 import { NavLink } from 'react-router-dom'
+import { getUserData } from '../utilities/auth';
 
-const links = [
-  { to: '/users', label: 'Users', icon: '👥' },
-  { to: '/clients', label: 'Clients', icon: '🏢' },
-  { to: '/contractors', label: 'Contractors', icon: '🔨' },
-  { to: '/consultants', label: 'Consultants', icon: '💼' },
-  { to: '/projects', label: 'Projects', icon: '🗂️' },
-  { to: '/main-form', label: 'Main Form', icon: '📋' },
-];
+const role = getUserData()?.role || 'Guest';
+const links =
+  role === "admin"
+    ? [
+        { to: "/home", label: "Dashboard", icon: "📊" },
+        { to: "/users", label: "Users", icon: "👥" },
+        { to: "/clients", label: "Clients", icon: "🏢" },
+        { to: "/contractors", label: "Contractors", icon: "🔨" },
+        { to: "/consultants", label: "Consultants", icon: "💼" },
+        { to: "/projects", label: "Projects", icon: "🗂️" },
+        { to: "/main-form", label: "Main Form", icon: "📋" },
+      ]
+    : role === "contractor_rep"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/contractor/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categories
+  { to: "/contractor/received", label: "Received", icon: "📨" },        // incoming mail
+  { to: "/contractor/pending", label: "Pending", icon: "⏳" },         // hourglass
+  { to: "/contractor/expired", label: "Expired", icon: "⌛" },         // time over
+]
+    :
+     role === "consultant_rep"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/consultant/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categories
+  { to: "/consultant/pending", label: "Pending", icon: "📨" },        // incoming mail
+  { to: "/consultant/received_from_contractor", label: "Received from Contractor", icon: "📨" },        // incoming mail
+  { to: "/consultant/send_to_contractor", label: "Send to Contractor", icon: "⏳" },         // hourglass
+  { to: "/consultant/received_from_re", label: "Received from RE", icon: "✅" },        // approved
+  { to: "/consultant/expired", label: "Expired", icon: "⌛" },         // time over
+]
+   : 
+    role === "inspector"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/inspector/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categories
+  { to: "/inspector/okay", label: "Pass Requests", icon: "✅" },        // incoming mail
+  { to: "/inspector/not_okay", label: "Fail Requests", icon: "📨" },        // incoming mail
+  { to: "/inspector/pending", label: "Pending Requests", icon: "⏳" },        // approved
+  { to: "/inspector/expired", label: "Expired", icon: "⌛" },         // time over
+]
+    : [];
+
 export default function Sidebar() {
   return (
     <aside className="w-64 bg-white h-[calc(100vh-4rem)] p-4 shadow-lg border-r border-gray-100">
