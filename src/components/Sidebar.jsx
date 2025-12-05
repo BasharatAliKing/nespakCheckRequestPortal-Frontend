@@ -42,11 +42,59 @@ const links =
   { to: "/home", label: "Dashboard", icon: "📊" },
   // Total Requests
   { to: "/inspector/all", label: "Total Requests", icon: "🗂️" },
-  // Request Status Categories
+  // Request Status Categoriespo
   { to: "/inspector/okay", label: "Pass Requests", icon: "✅" },        // incoming mail
   { to: "/inspector/not_okay", label: "Fail Requests", icon: "📨" },        // incoming mail
   { to: "/inspector/pending", label: "Pending Requests", icon: "⏳" },        // approved
   { to: "/inspector/expired", label: "Expired", icon: "⌛" },         // time over
+]
+   : 
+    role === "surveyor"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/surveyor/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categoriespo
+  { to: "/surveyor/okay", label: "Pass Requests", icon: "✅" },        // incoming mail
+  { to: "/surveyor/not_okay", label: "Fail Requests", icon: "📨" },        // incoming mail
+  { to: "/surveyor/pending", label: "Pending Requests", icon: "⏳" },        // approved
+  { to: "/surveyor/expired", label: "Expired", icon: "⌛" },         // time over
+]
+   : 
+    role === "me"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/me/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categoriespo
+  { to: "/me/okay", label: "Pass Requests", icon: "✅" },        // incoming mail
+  { to: "/me/not_okay", label: "Fail Requests", icon: "📨" },        // incoming mail
+  { to: "/me/pending", label: "Pending Requests", icon: "⏳" },        // approved
+  { to: "/me/expired", label: "Expired", icon: "⌛" },         // time over
+]
+   : 
+    role === "are"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/are/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categoriespo
+  { to: "/are/okay", label: "Pass Requests", icon: "✅" },        // incoming mail
+  { to: "/are/not_okay", label: "Fail Requests", icon: "📨" },        // incoming mail
+  { to: "/are/pending", label: "Pending Requests", icon: "⏳" },        // approved
+  { to: "/are/expired", label: "Expired", icon: "⌛" },         // time over
+]
+   : 
+    role === "re"
+    ? [
+  { to: "/home", label: "Dashboard", icon: "📊" },
+  // Total Requests
+  { to: "/re/all", label: "Total Requests", icon: "🗂️" },
+  // Request Status Categoriespo
+  { to: "/re/okay", label: "Approved Requests", icon: "✅" },        // incoming mail
+  { to: "/re/not_okay", label: "Not Approved Requests", icon: "📨" },        // incoming mail
+  { to: "/re/pending", label: "Pending Requests", icon: "⏳" },        // approved
+  { to: "/re/expired", label: "Expired", icon: "⌛" },         // time over
 ]
     : [];
 

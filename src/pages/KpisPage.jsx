@@ -33,7 +33,6 @@ const KpisPage = () => {
     contractor_submit_time: "",
   });
   const userRole=getUserData()?.role || '';
-  console.log(userRole);
   // Generate RFI number based on project and today's date
   const makeRfiNo = (projectId) => {
     const date = new Date();

@@ -144,7 +144,6 @@ export default function ClientsPage() {
           Add Client
         </button>
       </div>
-
       {listQuery.error && (
         <div className="text-red-600 text-sm">{String(listQuery.error.message || listQuery.error)}</div>
       )}

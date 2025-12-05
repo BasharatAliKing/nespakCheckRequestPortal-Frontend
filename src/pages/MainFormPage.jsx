@@ -932,8 +932,8 @@ export default function MainFormPage() {
                     className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select</option>
-                    <option value="approved">Approved</option>
-                    <option value="not_approved">Not Approved</option>
+                    <option value="okay">Approved</option>
+                    <option value="not_okay">Not Approved</option>
                   </select>
                 </div>
 
@@ -1287,21 +1287,21 @@ export default function MainFormPage() {
                     </tr>
                     <tr>
                       <td className="header-cell">Name:</td>
-                      <td>{viewingRow.consultant_name}</td>
+                      <td>{viewingRow.cons_stat_name}</td>
                       <td className="header-cell">Name:</td>
-                      <td>{viewingRow.contractor_name}</td>
+                      <td>{viewingRow. cont_rec_name}</td>
                     </tr>
                     <tr>
                       <td className="header-cell">Date:</td>
-                      <td>{viewingRow.consultant_update_date}</td>
+                      <td>{viewingRow.cons_stat_date}</td>
                       <td className="header-cell">Date:</td>
-                      <td>{formatDate(viewingRow.contractor_submit_date)}</td>
+                      <td>{formatDate(viewingRow. cont_rec_date)}</td>
                     </tr>
                     <tr>
                       <td className="header-cell">Time:</td>
-                      <td>{viewingRow.consultant_update_time}</td>
+                      <td>{viewingRow.cons_stat_time}</td>
                       <td className="header-cell">Time:</td>
-                      <td>{viewingRow.contractor_submit_time}</td>
+                      <td>{viewingRow. cont_rec_time}</td>
                     </tr>
                     <tr>
                       <td colSpan="4" className="text-xs italic">
