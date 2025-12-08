@@ -319,7 +319,6 @@ const kpisConfig = {
     },
   ],
 };
-
       const getKpisData = async () => {
         try {
           const res = await fetch(`${API_URL}/main-form/contractorkpis/`, {
@@ -444,168 +443,6 @@ const kpisConfig = {
   return (
  <>
     {/* Admin KPI Dashboard */}
-   {
-    // role === 'admin' ?
-    // ( <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    //     {/* Users */}
-    //     <Link to='/users' className="bg-gradient-to-r cursor-pointer from-blue-500 to-blue-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Total Users</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiUser.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <Users className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //     {/* Clients */}
-    //     <Link to='/clients' className="bg-gradient-to-r cursor-pointer from-pink-500 to-pink-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Total Clients</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiClients.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <UserCircle className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Contractors */}
-    //     <Link to='/contractors' className="bg-gradient-to-r cursor-pointer from-green-500 to-green-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Contractors</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiContractors.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <Briefcase className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Consultants */}
-    //     <Link to='/consultants' className="bg-gradient-to-r cursor-pointer from-purple-500 to-purple-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Consultants</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiConsultant.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <UserCheck className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Projects */}
-    //     <Link to='/projects' className="bg-gradient-to-r cursor-pointer from-orange-500 to-orange-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Projects</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiProjects.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <FolderKanban className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //     {/* Forms Submitted */}
-    //     <Link to="/main-form" className="bg-gradient-to-r from-red-500 to-red-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Forms Submitted</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiMainForm.length}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <FileEdit className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //   </div>
-    //   )
-    // //   Contractor KPI's Dashboard
-    //   : role ==='contractor_rep'?
-    //   ( 
-    //   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    //     {/* Users */}
-    //     <Link to='/users' className="bg-gradient-to-r cursor-pointer from-blue-500 to-blue-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Total Requests</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.total_request}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <Users className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //     {/* Clients */}
-    //     <Link to='/clients' className="bg-gradient-to-r cursor-pointer from-pink-500 to-pink-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Received Requests</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.received_request}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <UserCircle className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Contractors */}
-    //     <Link to='/contractors' className="bg-gradient-to-r cursor-pointer from-green-500 to-green-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Pending Requests</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.pending_request}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <Briefcase className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Consultants */}
-    //     <Link to='/consultants' className="bg-gradient-to-r cursor-pointer from-purple-500 to-purple-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Approved</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.approved}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <UserCheck className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-
-    //     {/* Projects */}
-    //     <Link to='/projects' className="bg-gradient-to-r cursor-pointer from-orange-500 to-orange-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Not Approved</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.not_approved}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <FolderKanban className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //     {/* Forms Submitted */}
-    //     <Link to="/main-form" className="bg-gradient-to-r from-red-500 to-red-700 text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md">
-    //       <div className="flex items-center justify-between">
-    //         <div>
-    //           <p className="text-base font-medium opacity-80">Expired</p>
-    //           <h2 className="text-4xl font-bold mt-2">{kpiData?.constractor?.expired}</h2>
-    //         </div>
-    //         <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-    //           <FileEdit className="w-8 h-8 text-white" />
-    //         </div>
-    //       </div>
-    //     </Link>
-    //   </div>)
-    //   :null
-   }
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
        {
         kpisConfig[role]?.map((kpi, index)=>(
@@ -622,8 +459,6 @@ const kpisConfig = {
         </Link>
         ))
        }      
-      
-       
       </div>
  </>
   )
