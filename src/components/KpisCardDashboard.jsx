@@ -81,6 +81,13 @@ const kpisConfig = {
       icon: "⏳",
     },
     {
+      label: "Revert Requests",
+      value: kpiData?.constractor?.revert,
+      link:"/contractor/revert",
+      bg:"from-purple-500 to-purple-700",
+      icon:"🔄",
+    },
+    {
       label: "Expired",
       value: kpiData?.constractor?.expired,
       link: "/contractor/expired",
@@ -122,6 +129,13 @@ const kpisConfig = {
       value: kpiData?.consultant?.consultant_received_from_re,
       link: "/consultant/received_from_re",
       bg: "from-yellow-500 to-yellow-700",
+      icon: "⏳",
+    },
+    {
+      label: "Revert Requests",
+      value: kpiData?.consultant?.consultant_revert,
+      link: "/consultant/revert",
+      bg: "from-orange-500 to-orange-700",
       icon: "⏳",
     },
     {

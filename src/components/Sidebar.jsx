@@ -21,6 +21,7 @@ const links =
   // Request Status Categories
   { to: "/contractor/received", label: "Received", icon: "📨" },        // incoming mail
   { to: "/contractor/pending", label: "Pending", icon: "⏳" },         // hourglass
+  { to: "/contractor/revert", label: "Revert", icon: "⏳" },         // hourglass
   { to: "/contractor/expired", label: "Expired", icon: "⌛" },         // time over
 ]
     :
