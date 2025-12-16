@@ -5,6 +5,7 @@ import { getToken, getUserData } from "../../utilities/auth";
 import Select from "react-select";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import ContractorForm from "../../components/ContractorForm";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -26,6 +27,7 @@ const TotalRequests = () => {
   const [inspecForm, setInspecForm] = useState(false);
   const { type, status } = useParams();
   const [users, setUsers] = useState([]);
+  const [revertContractor, setRevertContractor] = useState(false);
   const [consultantSelect, setConsultantSelect] = useState({
     selectInspector: "",
     selectSurveyor: "",
@@ -33,7 +35,6 @@ const TotalRequests = () => {
     selectARE: "",
     selectRE: "",
   });
-
   const optionsInspector = [
     ...users
       .filter((user) => user.role === "inspector")
@@ -74,7 +75,6 @@ const TotalRequests = () => {
         label: user.user_name,
       })),
   ];
-
   const queryKey = useMemo(() => ["requests", "list"], []);
   // Fetch requests
   const listQuery = useQuery({
@@ -139,13 +139,13 @@ const TotalRequests = () => {
       key: "actions",
       header: "Actions",
       render: (_, row) => {
-        if (role === "contractor_rep" && row.contractor_status === 'revert'){
+        if (role === "contractor_rep" && row.contractor_status === "revert") {
           return (
-             <button
-              // onClick={() => {
-              //   setSelectedRow(row);
-              //   setShowConsultantForm(true);
-              // }}
+            <button
+              onClick={() => {
+                setSelectedRow(row);
+                setRevertContractor(true);
+              }}
               className="px-3 py-1.5 cursor-pointer rounded bg-yellow-600 text-white text-xs font-medium hover:opacity-90"
             >
               Update Check Request
@@ -238,14 +238,14 @@ const TotalRequests = () => {
       key: "actions",
       header: "Actions",
       render: (_, row) => {
-          if (role === "contractor_rep" && row.contractor_status === 'revert'){
+        if (role === "contractor_rep" && row.contractor_status === "revert") {
           return (
-             <button
-              // onClick={() => {
-              //   setSelectedRow(row);
-              //   setShowConsultantForm(true);
-              // }}
-              className="px-3 py-1.5 cursor-pointer rounded bg-yellow-500 text-white text-xs font-medium hover:opacity-90"
+            <button
+              onClick={() => {
+                setSelectedRow(row);
+                setRevertContractor(true);
+              }}
+              className="px-3 py-1.5 cursor-pointer rounded bg-yellow-600 text-white text-xs font-medium hover:opacity-90"
             >
               Update Check Request
             </button>
@@ -339,46 +339,44 @@ const TotalRequests = () => {
   // update Inspector status here
   async function handleSubmit(e) {
     e.preventDefault();
-   
-if (role === "consultant_rep") {
-  if (!revertMode) {
-    if (consultantSelect.selectInspector === "") {
-      toast.error("Please select Inspector");
-      return;
+    if (role === "consultant_rep") {
+      if (!revertMode) {
+        if (consultantSelect.selectInspector === "") {
+          toast.error("Please select Inspector");
+          return;
+        }
+        if (consultantSelect.selectSurveyor === "") {
+          toast.error("Please select Surveyor");
+          return;
+        }
+        if (consultantSelect.selectME === "") {
+          toast.error("Please select ME");
+          return;
+        }
+        if (consultantSelect.selectARE === "") {
+          toast.error("Please select ARE");
+          return;
+        }
+        if (consultantSelect.selectRE === "") {
+          toast.error("Please select RE");
+          return;
+        }
+      } else {
+        if (remarks === "") {
+          toast.error("Revert Remarks are required");
+          return;
+        }
+      }
+    } else {
+      if (!statusValue) {
+        toast.error("Please select Pass or Fail");
+        return;
+      }
+      if (!remarks.trim()) {
+        toast.error("Remarks are required");
+        return;
+      }
     }
-    if (consultantSelect.selectSurveyor === "") {
-      toast.error("Please select Surveyor");
-      return;
-    }
-    if (consultantSelect.selectME === "") {
-      toast.error("Please select ME");
-      return;
-    }
-    if (consultantSelect.selectARE === "") {
-      toast.error("Please select ARE");
-      return;
-    }
-    if (consultantSelect.selectRE === "") {
-      toast.error("Please select RE");
-      return;
-    }
-  } else {
-    if (remarks === "") {
-      toast.error("Revert Remarks are required");
-      return;
-    }
-  }
-} else {
-  if (!statusValue) {
-    toast.error("Please select Pass or Fail");
-    return;
-  }
-  if (!remarks.trim()) {
-    toast.error("Remarks are required");
-    return;
-  }
-}
-
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -472,6 +470,8 @@ if (role === "consultant_rep") {
         // 🔥 Close modal
         setInspecForm(false);
         setShowConsultantForm(false);
+        setRemarks("");
+        setRevertMode(false);
         // 🔥 Reload API after 1 seconds
         setTimeout(() => {
           listQuery.refetch();
@@ -481,6 +481,7 @@ if (role === "consultant_rep") {
       console.error("Error updating status:", err);
     }
   }
+
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -519,12 +520,66 @@ if (role === "consultant_rep") {
           onClick={() => setInspecForm(false)}
           className="fixed inset-0 bg-black/30 grid place-items-center p-4"
         >
+          
           <form
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleSubmit}
-            className="w-full max-w-lg bg-white rounded p-4 space-y-3"
+            className="w-full max-w-3/4 bg-white rounded p-4 space-y-3"
           >
             <h3 className="text-lg font-medium">Update CR</h3>
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
+                <Display label="Project ID" value={selectedRow?.project_id} />
+                <Display label="RFI No" value={selectedRow?.rfi_no} />
+                <Display
+                  label="Date of RFI"
+                  value={selectedRow?.date_of_rfi?.slice(0, 10)}
+                />
+                <Display
+                  label="Previously Requested"
+                  value={selectedRow?.previously_requested}
+                />
+
+                {selectedRow?.previously_requested === "yes" && (
+                  <>
+                    <Display
+                      label="Previous RFI No"
+                      value={selectedRow?.previous_rfi_no}
+                    />
+                  </>
+                )}
+
+                <Display
+                  label="Date of Inspection"
+                  value={selectedRow?.date_of_inspection?.slice(0, 10)}
+                />
+                <Display
+                  label="Time of Inspection"
+                  value={selectedRow?.time_of_inspection}
+                />
+                <Display
+                  label="Type of Activity"
+                  value={selectedRow?.type_of_activity}
+                />
+                <Display label="Location" value={selectedRow?.location} />
+                <Display label="Bill No" value={selectedRow?.bill_no} />
+                <Display label="BOQ Item No" value={selectedRow?.boq_item_no} />
+                <Display
+                  label="Drawing Ref No"
+                  value={selectedRow?.drawing_ref_no}
+                />
+                <Display
+                  label="Contractor Status"
+                  value={selectedRow?.contractor_status}
+                />
+                <Display
+                  label="Contractor Submit Date"
+                  value={selectedRow?.contractor_submit_date || "—"}
+                />
+                <Display
+                  label="Contractor Submit Time"
+                  value={selectedRow?.contractor_submit_time || "—"}
+                />
+              </div>
             <div className="space-y-1">
               <label className="text-sm">Status</label>
               <div className="flex gap-5">
@@ -576,7 +631,7 @@ if (role === "consultant_rep") {
           <form
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleSubmit}
-            className="w-full sm:w-3/4 md:max-w-1/2 bg-white rounded p-4 space-y-4"
+            className="w-full sm:w-3/4 md:max-w-1/2 bg-white max-h-[90vh] rounded p-4 overflow-y-scroll space-y-4"
           >
             {/* HEADER + REVERT BUTTON */}
             <div className="flex justify-between items-center border-b pb-2">
@@ -765,6 +820,17 @@ if (role === "consultant_rep") {
           </form>
         </div>
       )}
+      {revertContractor ? (
+        <ContractorForm
+        mode="edit"
+        data={selectedRow}
+        onClose={() => {
+          setTimeout(() => {
+          listQuery.refetch();
+        }, 1000);
+        setRevertContractor(false)}}
+        />
+      ) : null}
     </>
   );
 };

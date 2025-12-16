@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { getToken, getUserData } from "../utilities/auth";
 import { toast } from "react-toastify";
+
 const API_URL = import.meta.env.VITE_API_BASE_URL;
-const ContractorForm = ({ onClose }) => {
+
+const ContractorForm = ({ onClose, data, mode = "create"  }) => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [kpiData, setKpiData] = useState([]);
- 
-  // Form state
+
   const [formDate, setFormDate] = useState({
     project_id: "",
     rfi_no: "",
@@ -27,106 +26,88 @@ const ContractorForm = ({ onClose }) => {
     contractor_submit_date: "",
     contractor_submit_time: "",
   });
-  const userRole = getUserData()?.role || "";
-  // Generate RFI number based on project and today's date
+
+  /* ---------------- PREFILL FOR UPDATE ---------------- */
+  useEffect(() => {
+    if (mode === "edit" && data) {
+      setFormDate({
+        consultant_remarks: data.consultant_remarks || "",
+        project_id: data.project_id?._id || data.project_id,
+        rfi_no: data.rfi_no || "",
+        date_of_rfi: data.date_of_rfi?.split("T")[0] || "",
+        previously_requested: data.previously_requested || "",
+        previous_rfi_no: data.previous_rfi_no || "",
+        date_of_inspection: data.date_of_inspection?.split("T")[0] || "",
+        time_of_inspection: data.time_of_inspection || "",
+        location: data.location || "",
+        type_of_activity: data.type_of_activity || "",
+        bill_no: data.bill_no || "",
+        boq_item_no: data.boq_item_no || "",
+        drawing_ref_no: data.drawing_ref_no || "",
+        contractor_name: data.contractor_name || "",
+        contractor_submit_date: data.contractor_submit_date || "",
+        contractor_submit_time: data.contractor_submit_time || "",
+      });
+    }
+  }, [mode, data]);
+
+  /* ---------------- GENERATE RFI NO ---------------- */
   const makeRfiNo = (projectId) => {
     const date = new Date();
-    const year = date.getFullYear().toString();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const todayStr = `${year}-${month}-${day}`;
-    console.log(todayStr);
-    const filteredForms = listMainForm.filter((form) => {
-      const projectMatch = form.project_id === projectId;
-      const formDateStr = form.date_of_rfi
-        ? form.date_of_rfi.split("T")[0]
-        : "";
-      const dateMatch = formDateStr === todayStr;
-      return projectMatch && dateMatch;
-    });
-    console.log(filteredForms);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    const today = `${y}-${m}-${d}`;
 
-    return `${year}${month}${day}-${String(filteredForms.length + 1).padStart(
-      2,
-      "0"
-    )}`;
+    const count = listMainForm.filter(
+      (f) =>
+        f.project_id === projectId &&
+        f.date_of_rfi?.split("T")[0] === today
+    ).length;
+
+    return `${y}${m}${d}-${String(count + 1).padStart(2, "0")}`;
   };
-  // Fetch projects
+
+  /* ---------------- API CALLS ---------------- */
   const fetchProjects = async () => {
-    try {
-      const res = await fetch(`${API_URL}/projects`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error("Failed to fetch projects");
-      setListProjects(data.projects || []);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await fetch(`${API_URL}/projects`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await res.json();
+    setListProjects(data.projects || []);
   };
-  const getKpisData = async () => {
-    try {
-      const res = await fetch(
-        `${API_URL}/main-form/contractorkpis/${
-          selectedOption === null ? "" : `${selectedOption?.value}`
-        }`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error("Failed to fetch KPI data");
-      setKpiData(data.kpiData || []);
-    } catch (err) {
-      console.log(err);
-    }
+
+  const fetchMainForms = async () => {
+    const res = await fetch(`${API_URL}/main-form`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await res.json();
+    setListMainForm(data.contractorForms || []);
   };
-   // Fetch main form
-    const mainForm = async () => {
-      try {
-        const res = await fetch(`${API_URL}/main-form`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error("Failed to fetch main form data");
-        setListMainForm(data.contractorForms || []);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-  // Handle project selection
+
+  useEffect(() => {
+    fetchProjects();
+    fetchMainForms();
+  }, []);
+
+  /* ---------------- HANDLERS ---------------- */
   const handleProjectSelect = (e) => {
     const projectId = e.target.value;
     setFormDate((prev) => ({
       ...prev,
       project_id: projectId,
-      rfi_no: makeRfiNo(projectId),
+      rfi_no: mode === "create" ? makeRfiNo(projectId) : prev.rfi_no,
     }));
   };
-  // Submit form
-  const handleSubmit = async (e) => {
+
+  /* ---------------- CREATE (POST) ---------------- */
+  const handleCreate = async (e) => {
     e.preventDefault();
-    // Get current date and time
+
     const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    const hh = String(now.getHours()).padStart(2, "0");
-    const min = String(now.getMinutes()).padStart(2, "0");
+    const submitDate = now.toISOString().split("T")[0];
+    const submitTime = now.toTimeString().slice(0, 5);
 
-    const submitDate = `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD
-    const submitTime = `${hh}:${min}`; // HH:MM in 24-hour format
-
-    const formDataWithDate = {
-      ...formDate,
-      contractor_submit_date: submitDate,
-      contractor_submit_time: submitTime,
-    };
     try {
       const res = await fetch(`${API_URL}/main-form`, {
         method: "POST",
@@ -134,47 +115,72 @@ const ContractorForm = ({ onClose }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify(formDataWithDate),
+        body: JSON.stringify({
+          ...formDate,
+          contractor_submit_date: submitDate,
+          contractor_submit_time: submitTime,
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) toast.error(data.message || "Failed to submit RFI form");
-      else {
-        toast.success("RFI form submitted successfully");
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(result.message || "Failed to submit");
+      } else {
+        toast.success("RFI submitted successfully");
         onClose();
-        setFormDate({
-          project_id: "",
-          rfi_no: "",
-          date_of_rfi: "",
-          previously_requested: "",
-          previous_rfi_no: "",
-          date_of_inspection: "",
-          time_of_inspection: "",
-          location: "",
-          type_of_activity: "",
-          bill_no: "",
-          boq_item_no: "",
-          drawing_ref_no: "",
-          contractor_name: `${getUserData()?.user_name || ""}`,
-          contractor_submit_date: "",
-          contractor_submit_time: "",
-        });
+       
       }
     } catch (err) {
       console.log(err);
     }
   };
-  useEffect(() => {
-    fetchProjects();
-    getKpisData();
-    mainForm();
-  }, [formDate, selectedOption]);
+
+  /* ---------------- UPDATE (PUT) ---------------- */
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    const now = new Date();
+    const submitDate = now.toISOString().split("T")[0];
+    const submitTime = now.toTimeString().slice(0, 5);
+
+    try {
+      const res = await fetch(`${API_URL}/main-form/${data._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+       body: JSON.stringify({
+          ...formDate,
+          contractor_status:"pending",
+          consultant_status:"pending",
+          consultant_remarks:"",
+          contractor_submit_date: submitDate,
+          contractor_submit_time: submitTime,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(result.message || "Update failed");
+      } else {
+        toast.success("RFI updated successfully");
+        onClose();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div
       onClick={() => onClose()}
       className="fixed inset-0 z-50 bg-[#00000061] grid place-items-center p-4"
     >
       <form
-        onSubmit={handleSubmit}
+         onSubmit={mode === "create" ? handleCreate : handleUpdate}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg relative bg-white rounded p-4 space-y-3"
       >
@@ -182,7 +188,20 @@ const ContractorForm = ({ onClose }) => {
           onClick={() => onClose()}
           className="absolute text-2xl top-3 right-3 cursor-pointer"
         />
-        <h3 className="text-lg font-medium">Create RFI</h3>
+        <h3 className="text-lg font-medium">{mode ==='create' ? 'Create RFI' : 'Update RFI'}</h3>
+        {/* Consultant Remarks for update RFI contractor */}
+       {
+        mode === 'edit' && (
+          <div className="space-y-1">
+            <label className="text-sm">Consultant Remarks</label>
+            <input
+              type="text"
+              value={formDate.consultant_remarks}
+              className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )
+       }
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Select Project */}
           <div className="space-y-1 flex flex-col text-black">
@@ -375,12 +394,18 @@ const ContractorForm = ({ onClose }) => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="bg-blue-500 p-2 rounded-md text-white font-medium cursor-pointer col-span-2"
-          >
-            Submit
-          </button>
+          <div className="col-span-2 flex gap-3">
+            {mode === "create" && (
+              <button type="submit" className="cursor-pointer bg-blue-600 text-white p-2 rounded w-full">
+                Submit
+              </button>
+            )}
+            {mode === "edit" && (
+              <button type="submit" className="cursor-pointer bg-green-600 text-white p-2 rounded w-full">
+                Update
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </div>
