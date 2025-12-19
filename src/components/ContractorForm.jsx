@@ -103,7 +103,6 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
   /* ---------------- CREATE (POST) ---------------- */
   const handleCreate = async (e) => {
     e.preventDefault();
-
     const now = new Date();
     const submitDate = now.toISOString().split("T")[0];
     const submitTime = now.toTimeString().slice(0, 5);
@@ -182,7 +181,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       <form
          onSubmit={mode === "create" ? handleCreate : handleUpdate}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg relative bg-white rounded p-4 space-y-3"
+        className="w-full sm:max-w-2/4 relative bg-white rounded max-h-[90vh] overflow-y-auto p-4 space-y-3"
       >
         <IoCloseCircleOutline
           onClick={() => onClose()}

@@ -61,7 +61,7 @@ const UpdateConsAfterRe = ({ selectedRow, hideConsAfterRe }) => {
   return (
     <div className="fixed inset-0 bg-black/30 grid w-full  overflow-y-scroll place-items-center p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-        <Display label="Project ID" value={selectedRow?.project_id} />
+        <Display label="Project ID" value={selectedRow?.project_title} />
         <Display label="RFI No" value={selectedRow?.rfi_no} />
         <Display
           label="Date of RFI"

@@ -670,12 +670,11 @@ const TotalRequests = () => {
           <form
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleSubmit}
-            className="w-full sm:w-3/4 md:max-w-1/2 bg-white max-h-[90vh] rounded p-4 overflow-y-scroll space-y-4"
+            className="w-full sm:w-3/4 md:max-w-3/4 bg-white max-h-[90vh] rounded p-4 overflow-y-auto space-y-4"
           >
             {/* HEADER + REVERT BUTTON */}
             <div className="flex justify-between items-center border-b pb-2">
               <h3 className="text-xl font-semibold">Update Check Request</h3>
-
               <button
                 type="button"
                 onClick={() => setRevertMode(!revertMode)}
@@ -684,7 +683,6 @@ const TotalRequests = () => {
                 {revertMode ? "Cancel Revert" : "Revert"}
               </button>
             </div>
-
             {/* ------------------------------------------------------------------ */}
             {/* VIEW API FIELDS (HIDDEN IN REVERT MODE) */}
             {/* ------------------------------------------------------------------ */}
