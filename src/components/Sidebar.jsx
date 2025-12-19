@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { getUserData } from "../utilities/auth";
 
+export default function Sidebar() {
 const role = getUserData()?.role || "Guest";
 const links =
   role === "admin"
@@ -113,7 +114,7 @@ const links =
       ]
     : [];
 
-export default function Sidebar() {
+
   return (
     <aside className="w-64 bg-white h-[calc(100vh-4rem)] overflow-y-auto p-4 shadow-lg border-r border-gray-100">
       <nav className="flex flex-col gap-2">

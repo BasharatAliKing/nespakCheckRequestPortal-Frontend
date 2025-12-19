@@ -6,16 +6,13 @@ const API_URL = import.meta.env.VITE_API_BASE_URL
 
 export default function Login() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from?.pathname || '/'
+  // Always redirect to /home after login
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  if (isAuthenticated()) {
-    navigate(from, { replace: true })
-  }
+
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -37,7 +34,7 @@ export default function Login() {
       if (!token) throw new Error('Invalid login response')
       userData(data?.user);
       setToken(token);
-      navigate(from, { replace: true })
+      navigate('/home', { replace: true })
     } catch (err) {
       setError(err.message || 'Login failed')
     } finally {

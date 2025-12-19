@@ -23,35 +23,25 @@ function App() {
     <>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              {role  ? (
-                <DashboardLayout />
-              ): (
-                <Navigate to="/login" replace />
-              )}
-            </ProtectedRoute>
-          }
-        >
-          {role  ? (
-            <>
-              <Route index element={<Navigate to="home" replace />} />
-              <Route path="home" element={<Dashboard />} />
-              <Route path='/:type/:status' element={<TotalRequests />} />
-              <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
-              <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
-              <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />
-              <Route path="projects" element={<AdminRoute><ProjectsPage /></AdminRoute>} />
-              <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
-              <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
-            </>
-          )
-       :
-         null
-        }
-        </Route>
+       <Route
+  path="/"
+  element={
+    <ProtectedRoute>
+      <DashboardLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<Navigate to="home" replace />} />
+  <Route path="home" element={<Dashboard />} />
+  <Route path='/:type/:status' element={<TotalRequests />} />
+  <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
+  <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
+  <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />
+  <Route path="projects" element={<AdminRoute><ProjectsPage /></AdminRoute>} />
+  <Route path="consultants" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
+  <Route path="main-form" element={<AdminRoute><MainFormPage /></AdminRoute>} />
+</Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={2000} />

@@ -90,7 +90,7 @@ const KpisCardDashboard = ({ refresh }) => {
         icon: "🔄",
       },
       {
-        label: "Received Requests",
+        label: "InProgress Requests",
         value: kpiData?.constractor?.received_request,
         link: "/contractor/received",
         bg: "from-green-500 to-green-700",
@@ -141,13 +141,13 @@ const KpisCardDashboard = ({ refresh }) => {
         bg: "from-green-500 to-green-700",
         icon: "📨",
       },
-      {
-        label: "Send to Contractor",
-        value: kpiData?.consultant?.consultant_pending,
-        link: "/consultant/pending",
-        bg: "from-purple-500 to-purple-700",
-        icon: "⏳",
-      },
+      // {
+      //   label: "Send to Contractor",
+      //   value: kpiData?.consultant?.consultant_send_to_contractor,
+      //   link: "/consultant/consultant_send_to_contractor",
+      //   bg: "from-purple-500 to-purple-700",
+      //   icon: "⏳",
+      // },
       {
         label: "Received from RE",
         value: kpiData?.consultant?.consultant_received_from_re,
