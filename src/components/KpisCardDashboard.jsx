@@ -75,6 +75,20 @@ const KpisCardDashboard = ({ refresh }) => {
         bg: "from-indigo-500 to-indigo-700",
         icon: "📁",
       },
+       {
+        label: "Pending Requests",
+        value: kpiData?.constractor?.pending_request,
+        link: "/contractor/pending",
+        bg: "from-yellow-500 to-yellow-700",
+        icon: "⏳",
+      },
+       {
+        label: "Received From Consultant",
+        value: kpiData?.constractor?.received_from_consultant,
+        link: "/contractor/received_from_consultant",
+        bg: "from-gray-500 to-gray-700",
+        icon: "🔄",
+      },
       {
         label: "Received Requests",
         value: kpiData?.constractor?.received_request,
@@ -83,11 +97,11 @@ const KpisCardDashboard = ({ refresh }) => {
         icon: "📨",
       },
       {
-        label: "Pending Requests",
-        value: kpiData?.constractor?.pending_request,
-        link: "/contractor/pending",
-        bg: "from-yellow-500 to-yellow-700",
-        icon: "⏳",
+        label: "Approved Requests",
+        value: kpiData?.constractor?.approved,
+        link: "/contractor/approved",
+        bg: "from-pink-500 to-pink-700",
+        icon: "🔄",
       },
       {
         label: "Revert Requests",
@@ -96,6 +110,7 @@ const KpisCardDashboard = ({ refresh }) => {
         bg: "from-purple-500 to-purple-700",
         icon: "🔄",
       },
+     
       {
         label: "Expired",
         value: kpiData?.constractor?.expired,
@@ -145,6 +160,13 @@ const KpisCardDashboard = ({ refresh }) => {
         value: kpiData?.consultant?.consultant_revert,
         link: "/consultant/revert",
         bg: "from-orange-500 to-orange-700",
+        icon: "⏳",
+      },
+      {
+        label: "Approved Requests",
+        value: kpiData?.consultant?.consultant_approved,
+        link: "/consultant/approved",
+        bg: "from-pink-500 to-pink-700",
         icon: "⏳",
       },
       {
@@ -313,14 +335,14 @@ const KpisCardDashboard = ({ refresh }) => {
       },
       {
         label: "Approved Requests",
-        value: kpiData?.re?.re_okay,
+        value: kpiData?.re?.re_approved,
         link: "/re/okay",
         bg: "from-teal-500 to-cyan-600",
         icon: "📁",
       },
       {
         label: "Not Approved Requests",
-        value: kpiData?.re?.re_not_okay,
+        value: kpiData?.re?.re_not_approved,
         link: "/re/not_okay",
         bg: "from-green-500 to-green-700",
         icon: "📨",

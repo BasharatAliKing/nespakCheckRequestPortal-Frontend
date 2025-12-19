@@ -1261,9 +1261,9 @@ export default function MainFormPage() {
                     </tr>
                       <tr>
                       <td className="header-cell" style={{width: '15%'}}>Approved</td>
-                      <td style={{width: '10%'}}>{viewingRow.re_status === 'approved' ? '✓' : ''}</td>
+                      <td style={{width: '10%'}}>{viewingRow.re_status === 'okay' ? '✓' : ''}</td>
                       <td className="header-cell" style={{width: '15%'}}>Not Approved</td>
-                      <td style={{width: '10%'}}>{viewingRow.re_status === 'not_approved' ? '✓' : ''}</td>
+                      <td style={{width: '10%'}}>{viewingRow.re_status === 'not_okay' ? '✓' : ''}</td>
                     </tr>
                     <td colSpan="4" className="header-cell">
                        <strong>Remarks:</strong> {viewingRow.re_remarks}

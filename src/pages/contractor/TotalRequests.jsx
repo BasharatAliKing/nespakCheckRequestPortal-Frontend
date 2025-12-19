@@ -6,6 +6,7 @@ import Select from "react-select";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ContractorForm from "../../components/ContractorForm";
+import UpdateConsAfterRe from "../../components/UpdateConsAfterRe";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,6 +20,8 @@ const TotalRequests = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [revertMode, setRevertMode] = useState(false);
   const [showConsultantForm, setShowConsultantForm] = useState(false);
+  const [showConsultantReceiveForm, setShowConsultantReceiveForm] =
+    useState(false);
   const [remarks, setRemarks] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const role = getUserData()?.role || "";
@@ -123,7 +126,7 @@ const TotalRequests = () => {
         };
       });
   }, [listQuery.data, projectsQuery.data, selectedProject]);
-
+  console.log(selectedRow);
   const columns = [
     { key: "sno", header: "#" },
     { key: "rfi_no", header: "RFI No" },
@@ -132,8 +135,8 @@ const TotalRequests = () => {
   // ➤ Add consultant-only fields
   if (role === "consultant_rep") {
     columns.push(
-      { key: "contractor_update_date", header: "Date of Submission" },
-      { key: "contractor_update_time", header: "Time of Submission" }
+      { key: "contractor_submit_date", header: "Date of Submission" },
+      { key: "contractor_submit_time", header: "Time of Submission" }
     );
     columns.push({
       key: "actions",
@@ -144,7 +147,7 @@ const TotalRequests = () => {
             <button
               onClick={() => {
                 setSelectedRow(row);
-                setRevertContractor(true);
+                setShowConsultantReceiveForm(true);
               }}
               className="px-3 py-1.5 cursor-pointer rounded bg-yellow-600 text-white text-xs font-medium hover:opacity-90"
             >
@@ -161,6 +164,17 @@ const TotalRequests = () => {
               className="px-3 py-1.5 cursor-pointer rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90"
             >
               Pending
+            </button>
+          ) : role === "consultant_rep" &&
+            row.consultant_status === "received_from_re" ? (
+            <button
+              onClick={() => {
+                setSelectedRow(row);
+                setShowConsultantReceiveForm(true);
+              }}
+              className="px-3 py-1.5 cursor-pointer rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90"
+            >
+              Received from RE
             </button>
           ) : null;
         } else if (role === "inspector" && row.inspector_status === "pending") {
@@ -250,7 +264,22 @@ const TotalRequests = () => {
               Update Check Request
             </button>
           );
-        } else if (role === "consultant_rep") {
+        } 
+        else if (role === "contractor_rep" && row.contractor_status === "received_from_consultant") {
+          return (
+            <button
+              onClick={() => {
+                setSelectedRow(row);
+                setShowConsultantReceiveForm(true);
+              }}
+              className="px-3 py-1.5 cursor-pointer rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90"
+            >
+              Accept Request
+            </button>
+          );
+        } 
+        
+        else if (role === "consultant_rep") {
           return row.contractor_status === "pending" ? (
             <button
               onClick={() => {
@@ -260,6 +289,16 @@ const TotalRequests = () => {
               className="px-3 py-1.5 cursor-pointer rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90"
             >
               Pending
+            </button>
+          ) : row.contractor_status === "received_from_re" ? (
+            <button
+              onClick={() => {
+                setSelectedRow(row);
+                setShowConsultantForm(true);
+              }}
+              className="px-3 py-1.5 cursor-pointer rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90"
+            >
+              Received from RE
             </button>
           ) : null;
         } else if (role === "inspector" && row.inspector_status === "pending") {
@@ -451,9 +490,10 @@ const TotalRequests = () => {
         re_name: getUserData().user_name,
         re_update_date: submitDate,
         re_update_time: submitTime,
-        cons_stat_status: "pending",
+        // cons_stat_status: "pending",
         re_status: statusValue,
         re_remarks: remarks,
+        consultant_status: "received_from_re",
       }),
     };
     try {
@@ -520,66 +560,65 @@ const TotalRequests = () => {
           onClick={() => setInspecForm(false)}
           className="fixed inset-0 bg-black/30 grid place-items-center p-4"
         >
-          
           <form
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleSubmit}
             className="w-full max-w-3/4 bg-white rounded p-4 space-y-3"
           >
             <h3 className="text-lg font-medium">Update CR</h3>
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-                <Display label="Project ID" value={selectedRow?.project_id} />
-                <Display label="RFI No" value={selectedRow?.rfi_no} />
-                <Display
-                  label="Date of RFI"
-                  value={selectedRow?.date_of_rfi?.slice(0, 10)}
-                />
-                <Display
-                  label="Previously Requested"
-                  value={selectedRow?.previously_requested}
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
+              <Display label="Project ID" value={selectedRow?.project_id} />
+              <Display label="RFI No" value={selectedRow?.rfi_no} />
+              <Display
+                label="Date of RFI"
+                value={selectedRow?.date_of_rfi?.slice(0, 10)}
+              />
+              <Display
+                label="Previously Requested"
+                value={selectedRow?.previously_requested}
+              />
 
-                {selectedRow?.previously_requested === "yes" && (
-                  <>
-                    <Display
-                      label="Previous RFI No"
-                      value={selectedRow?.previous_rfi_no}
-                    />
-                  </>
-                )}
+              {selectedRow?.previously_requested === "yes" && (
+                <>
+                  <Display
+                    label="Previous RFI No"
+                    value={selectedRow?.previous_rfi_no}
+                  />
+                </>
+              )}
 
-                <Display
-                  label="Date of Inspection"
-                  value={selectedRow?.date_of_inspection?.slice(0, 10)}
-                />
-                <Display
-                  label="Time of Inspection"
-                  value={selectedRow?.time_of_inspection}
-                />
-                <Display
-                  label="Type of Activity"
-                  value={selectedRow?.type_of_activity}
-                />
-                <Display label="Location" value={selectedRow?.location} />
-                <Display label="Bill No" value={selectedRow?.bill_no} />
-                <Display label="BOQ Item No" value={selectedRow?.boq_item_no} />
-                <Display
-                  label="Drawing Ref No"
-                  value={selectedRow?.drawing_ref_no}
-                />
-                <Display
-                  label="Contractor Status"
-                  value={selectedRow?.contractor_status}
-                />
-                <Display
-                  label="Contractor Submit Date"
-                  value={selectedRow?.contractor_submit_date || "—"}
-                />
-                <Display
-                  label="Contractor Submit Time"
-                  value={selectedRow?.contractor_submit_time || "—"}
-                />
-              </div>
+              <Display
+                label="Date of Inspection"
+                value={selectedRow?.date_of_inspection?.slice(0, 10)}
+              />
+              <Display
+                label="Time of Inspection"
+                value={selectedRow?.time_of_inspection}
+              />
+              <Display
+                label="Type of Activity"
+                value={selectedRow?.type_of_activity}
+              />
+              <Display label="Location" value={selectedRow?.location} />
+              <Display label="Bill No" value={selectedRow?.bill_no} />
+              <Display label="BOQ Item No" value={selectedRow?.boq_item_no} />
+              <Display
+                label="Drawing Ref No"
+                value={selectedRow?.drawing_ref_no}
+              />
+              <Display
+                label="Contractor Status"
+                value={selectedRow?.contractor_status}
+              />
+              <Display
+                label="Contractor Submit Date"
+                value={selectedRow?.contractor_submit_date || "—"}
+              />
+              <Display
+                label="Contractor Submit Time"
+                value={selectedRow?.contractor_submit_time || "—"}
+              />
+            </div>
             <div className="space-y-1">
               <label className="text-sm">Status</label>
               <div className="flex gap-5">
@@ -822,15 +861,27 @@ const TotalRequests = () => {
       )}
       {revertContractor ? (
         <ContractorForm
-        mode="edit"
-        data={selectedRow}
-        onClose={() => {
-          setTimeout(() => {
-          listQuery.refetch();
-        }, 1000);
-        setRevertContractor(false)}}
+          mode="edit"
+          data={selectedRow}
+          onClose={() => {
+            setTimeout(() => {
+              listQuery.refetch();
+            }, 1000);
+            setRevertContractor(false);
+          }}
         />
       ) : null}
+      {showConsultantReceiveForm && (
+        <UpdateConsAfterRe
+          hideConsAfterRe={() => {
+            setTimeout(() => {
+              listQuery.refetch();
+            }, 1000);
+            setShowConsultantReceiveForm(false);
+          }}
+          selectedRow={selectedRow}
+        />
+      )}
     </>
   );
 };
