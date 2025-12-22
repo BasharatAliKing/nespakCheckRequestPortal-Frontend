@@ -43,40 +43,47 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center bg-gray-50 p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white border rounded p-6 space-y-4">
-        <h1 className="text-xl font-semibold text-center">Sign in</h1>
-        {error && <div className="text-red-600 text-sm">{error}</div>}
-        <div className="space-y-1">
-          <label className="text-sm" htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm" htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white rounded py-2 disabled:opacity-50"
-          disabled={loading}
-        >
-          {loading ? 'Signing in…' : 'Sign in'}
-        </button>
+    <div className="bg-[url('/login_bg.png')] bg-no-repeat bg-center bg-cover ">
+     <div className='bg-[#31221261] min-h-screen grid place-items-center p-4'>
+      <form onSubmit={handleSubmit} className="w-full relative pb-20 max-w-[300px] max-h-[80vh] shadow-2xl rounded p-6 pb-2 space-y-4">
+        <img src="/card-bg.png" className='absolute rounded-md inset-0 h-full w-full  z-0' alt="" />
+          {/* Content (TOP) */}
+  <div className="relative z-10 space-y-4">
+    <img src="/icon.png" className="h-20 w-20 mx-auto" alt="icon" />
+    {error && <div className="text-red-400 text-sm">{error}</div>}
+    <div className="flex flex-col gap-1">
+      <label className="text-sm text-white font-medium">Email</label>
+      <input
+        type="email"
+        className="w-full bg-white rounded px-3 py-[5px] outline-none focus:ring-2 focus:ring-blue-500"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+    </div>
+
+    <div className="flex flex-col gap-1">
+      <label className="text-sm text-white font-medium">Password</label>
+      <input
+        type="password"
+        className="w-full bg-white rounded px-3 py-[5px] outline-none focus:ring-2 focus:ring-blue-500"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+    </div>
+    <button
+      type="submit"
+      className="w-full bg-[#1e5392] mt-4 font-medium text-sm text-white rounded py-2 disabled:opacity-50"
+      disabled={loading}
+    >
+      {loading ? 'LOGGING IN…' : 'LOG IN'}
+    </button>
+   </div>
       </form>
     </div>
+    <img src="/man.png" className='absolute bottom-0 left-5 opacity-60' width="10%" alt="" />
+    <img src="/nespaklogo.png" width="20%"  className='absolute bottom-5 right-5' alt="" />
+     </div>
   )
 }
