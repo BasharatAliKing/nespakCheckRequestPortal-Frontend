@@ -28,7 +28,7 @@ const UpdateConsAfterRe = ({ selectedRow, hideConsAfterRe }) => {
     const payload = {
         ...(role === "consultant_rep" && {
       cons_stat_name: getUserData().user_name,
-      contractor_status:"received_from_contractor",
+      contractor_status:"received_from_consultant",
       consultant_status: "approved",
        cons_stat_time: submitTime,
         cons_stat_date: submitDate,
@@ -59,8 +59,8 @@ const UpdateConsAfterRe = ({ selectedRow, hideConsAfterRe }) => {
     }
   }
   return (
-    <div className="fixed inset-0 bg-black/30 grid w-full  overflow-y-scroll place-items-center p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
+    <div onClick={()=>{hideConsAfterRe()}} className="fixed inset-0 bg-black/30 grid w-full  overflow-y-scroll place-items-center p-4">
+      <div  onClick={(e) => e.stopPropagation()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
         <Display label="Project ID" value={selectedRow?.project_title} />
         <Display label="RFI No" value={selectedRow?.rfi_no} />
         <Display

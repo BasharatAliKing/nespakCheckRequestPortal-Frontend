@@ -1192,7 +1192,7 @@ export default function MainFormPage() {
                          <td className="header-cell">Name:</td>
                          <td>{viewingRow.surveyor_name}</td>
                          <td className="header-cell">Status:</td>
-                         <td> <strong>{viewingRow.surveyor_status === 'okay' ? 'Pass' : 'Fail'}</strong></td>
+                         <td> <strong>{viewingRow.surveyor_status === 'okay' ? 'Pass' : viewingRow.surveyor_status === 'not_okay'? "Fail" : ''}</strong></td>
                       </tr>
                         <tr>
                          <td className="header-cell">Date:</td>
@@ -1213,7 +1213,7 @@ export default function MainFormPage() {
                          <td className="header-cell">Name:</td>
                          <td>{viewingRow.me_name}</td>
                          <td className="header-cell">Status:</td>
-                         <td> <strong>{viewingRow.me_status === 'okay' ? 'Pass' : 'Fail'}</strong></td>
+                         <td> <strong>{viewingRow.me_status === 'okay' ? 'Pass': viewingRow.me_status === 'not_okay'?  'Fail' : ''}</strong></td>
                       </tr>
                         <tr>
                          <td className="header-cell">Date:</td>
@@ -1234,7 +1234,7 @@ export default function MainFormPage() {
                          <td className="header-cell">Name:</td>
                          <td>{viewingRow.are_name}</td>
                          <td className="header-cell">Status:</td>
-                         <td> <strong>{viewingRow.are_status === 'okay' ? 'Pass' : 'Fail'}</strong></td>
+                         <td> <strong>{viewingRow.are_status === 'okay' ? 'Pass' : viewingRow.are_status === 'not_okay'? 'Fail' : ''}</strong></td>
                       </tr>
                         <tr>
                          <td className="header-cell">Date:</td>

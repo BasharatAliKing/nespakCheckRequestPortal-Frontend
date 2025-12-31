@@ -12,7 +12,7 @@ const Dashboard = () => {
   return (
     <>
       {/* Page Title */}
-      <div className="flex  items-center justify-between">
+      <div className="flex  items-center justify-between ">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">
           <span className="capitalize">{role.replace("_rep", "")}</span>{" "}
           Dashboard

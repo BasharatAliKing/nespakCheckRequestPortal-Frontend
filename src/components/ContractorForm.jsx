@@ -116,6 +116,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
         },
         body: JSON.stringify({
           ...formDate,
+          selected_contractor:getUserData()._id,
           contractor_submit_date: submitDate,
           contractor_submit_time: submitTime,
         }),
@@ -152,6 +153,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
         },
        body: JSON.stringify({
           ...formDate,
+          selected_contractor:getUserData()._id,
           contractor_status:"pending",
           consultant_status:"pending",
           consultant_remarks:"",

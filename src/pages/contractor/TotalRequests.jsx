@@ -85,8 +85,16 @@ const TotalRequests = () => {
     queryFn: async () => {
       const url =
         selectedProject === ""
-          ? `${API_URL}/main-form/status/${type}/${status}`
-          : `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`;
+          ? role === "consultant_rep"
+            ? `${API_URL}/main-form/status/${type}/${status}`
+            : `${API_URL}/main-form/status/${type}/${status}/${role}/${
+                getUserData()._id
+              }`
+          : role === "consultant_rep"
+          ? `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`
+          : `${API_URL}/main-form/status/${selectedProject}/${type}/${status}/${role}/${
+              getUserData()._id
+            }`;
       const res = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -264,8 +272,10 @@ const TotalRequests = () => {
               Update Check Request
             </button>
           );
-        } 
-        else if (role === "contractor_rep" && row.contractor_status === "received_from_consultant") {
+        } else if (
+          role === "contractor_rep" &&
+          row.contractor_status === "received_from_consultant"
+        ) {
           return (
             <button
               onClick={() => {
@@ -277,9 +287,7 @@ const TotalRequests = () => {
               Accept Request
             </button>
           );
-        } 
-        
-        else if (role === "consultant_rep") {
+        } else if (role === "consultant_rep") {
           return row.contractor_status === "pending" ? (
             <button
               onClick={() => {
@@ -521,7 +529,6 @@ const TotalRequests = () => {
       console.error("Error updating status:", err);
     }
   }
-
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -567,7 +574,7 @@ const TotalRequests = () => {
           >
             <h3 className="text-lg font-medium">Update CR</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-              <Display label="Project ID" value={selectedRow?.project_id} />
+              <Display label="Project ID" value={selectedRow?.project_title} />
               <Display label="RFI No" value={selectedRow?.rfi_no} />
               <Display
                 label="Date of RFI"
@@ -688,7 +695,7 @@ const TotalRequests = () => {
             {/* ------------------------------------------------------------------ */}
             {!revertMode && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-                <Display label="Project ID" value={selectedRow?.project_id} />
+                <Display label="Project ID" value={selectedRow?.project_title} />
                 <Display label="RFI No" value={selectedRow?.rfi_no} />
                 <Display
                   label="Date of RFI"
