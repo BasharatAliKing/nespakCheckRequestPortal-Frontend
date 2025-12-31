@@ -87,12 +87,16 @@ const TotalRequests = () => {
         selectedProject === ""
           ? role === "consultant_rep"
             ? `${API_URL}/main-form/status/${type}/${status}`
-            : `${API_URL}/main-form/status/${type}/${status}/${role}/${
+            : `${API_URL}/main-form/status/${
+                type === "contractor_rep" ? "contractor" : type
+              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
                 getUserData()._id
               }`
           : role === "consultant_rep"
           ? `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`
-          : `${API_URL}/main-form/status/${selectedProject}/${type}/${status}/${role}/${
+          : `${API_URL}/main-form/status/${
+              type === "contractor_rep" ? "contractor" : type
+            }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
               getUserData()._id
             }`;
       const res = await fetch(url, {
@@ -695,7 +699,10 @@ const TotalRequests = () => {
             {/* ------------------------------------------------------------------ */}
             {!revertMode && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-                <Display label="Project ID" value={selectedRow?.project_title} />
+                <Display
+                  label="Project ID"
+                  value={selectedRow?.project_title}
+                />
                 <Display label="RFI No" value={selectedRow?.rfi_no} />
                 <Display
                   label="Date of RFI"

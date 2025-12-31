@@ -23,14 +23,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-const statusData = [
-  { name: "Revert", value: 5.9, color: "#3b82f6" },
-  { name: "InProgress", value: 52.9, color: "#22c55e" },
-  { name: "Pending", value: 17.6, color: "#facc15" },
-  { name: "Expired", value: 2.9, color: "#ef4444" },
-  { name: "Rejected", value: 14.7, color: "#6b7280" },
-  { name: "Completed", value: 11.8, color: "#14b8a6" },
-];
+
 
 const monthlyData = [
   { month: "Jan", approval: 5 },
@@ -42,6 +35,9 @@ const monthlyData = [
   { month: "Jul", approval: 28 },
   { month: "Aug", approval: 35 },
   { month: "Sep", approval: 40 },
+  { month: "Oct", approval: 42 },
+  { month: "Nov", approval: 45 },
+  { month: "Dec", approval: 30 },
 ];
 
 const recentRequests = [
@@ -59,7 +55,61 @@ const KpisCardDashboard = ({ refresh }) => {
   const [kpiProjects, setKpiProjects] = useState([]);
   const [kpiMainForm, setKpiMainForm] = useState([]);
   const role = getUserData()?.role || "Guest";
-  
+  let statusData=[];
+ if (role === "contractor_rep") {
+  statusData = [
+    {
+      name: "Revert",
+      value: kpiData?.constractor?.revert ?? 0,
+      color: "#3b82f6",
+    },
+    {
+      name: "InProgress",
+      value: kpiData?.constractor?.received_request ?? 0,
+      color: "#22c55e",
+    },
+    {
+      name: "Pending",
+      value: kpiData?.constractor?.pending_request ?? 0,
+      color: "#facc15",
+    },
+    {
+      name: "Expired",
+      value: kpiData?.constractor?.expired ?? 0,
+      color: "#ef4444",
+    },
+    {
+      name: "Received from Consultant",
+      value: kpiData?.constractor?.received_from_consultant ?? 0,
+      color: "#14b8a6",
+    },
+  ];
+} 
+else if (role === "consultant_rep") {
+  statusData = [
+    {
+      name: "Pending",
+      value: kpiData?.consultant?.consultant_pending ?? 0,
+      color: "#facc15",
+    },
+    {
+      name: "Received from RE",
+      value: kpiData?.consultant?.received_from_re ?? 0,
+      color: "#ef4444",
+    },
+    {
+      name: "Revert",
+      value: kpiData?.consultant?.consultant_revert ?? 0,
+      color: "#3b82f6",
+    },
+    {
+      name: "Approved",
+      value: kpiData?.consultant?.consultant_approved ?? 0,
+      color: "#13f30fff",
+    },
+  ];
+}
+
   const kpisConfig = {
     admin: [
       {
@@ -580,7 +630,7 @@ const KpisCardDashboard = ({ refresh }) => {
                       />
                       {s.name}
                     </span>
-                    <span>{s.value}%</span>
+                    <span>{s.value}</span>
                   </div>
                 ))}
               </div>
