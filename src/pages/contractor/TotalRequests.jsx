@@ -386,7 +386,6 @@ const TotalRequests = () => {
       label: proj.project_title,
     })) || []),
   ];
-
   // update Inspector status here
   async function handleSubmit(e) {
     e.preventDefault();

@@ -12,7 +12,7 @@ const links =
         { to: "/contractors", label: "Contractors", icon: "🔨" },
         { to: "/consultants", label: "Consultants", icon: "💼" },
         { to: "/projects", label: "Projects", icon: "🗂️" },
-        { to: "/main-form", label: "Main Form", icon: "📋" },
+        { to: "/main-form", label: "Check Requests", icon: "📋" },
       ]
     : role === "contractor_rep"
     ? [

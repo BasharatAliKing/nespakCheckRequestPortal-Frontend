@@ -704,6 +704,7 @@ else if (role === "consultant_rep") {
           </table>
         </div>
       </div>
+      <img src="/nespaklogo.png" className="ml-auto" width="30%" alt="" />
     </>
   );
 };

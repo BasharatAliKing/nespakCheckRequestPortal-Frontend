@@ -7,7 +7,7 @@ export default function Navbar() {
         <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md">
           <span className="text-blue-600 font-bold text-xl">N</span>
         </div>
-        <h1 className="text-xl font-bold text-white">NESPAK Portal</h1>
+        <h1 className="text-xl font-bold text-white">NESPAK Check Request Portal</h1>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-blue-100 text-sm hidden md:block">Welcome back!</span>

@@ -453,7 +453,7 @@ export default function MainFormPage() {
       <ToastContainer position="top-right" autoClose={2000} />
       {loading && <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><div className="loader" /></div>}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Main Form (RFI)</h2>
+        <h2 className="text-xl font-semibold">Check Request (RFI)</h2>
         <button className="px-3 py-1 text-sm md:text-base cursor-pointer rounded bg-blue-600 text-white" onClick={openCreate}>
           Add New Form
         </button>
