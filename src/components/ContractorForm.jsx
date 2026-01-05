@@ -183,7 +183,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       <form
          onSubmit={mode === "create" ? handleCreate : handleUpdate}
         onClick={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-2/4 relative bg-white rounded max-h-[90vh] overflow-y-auto p-4 space-y-3"
+        className="w-full sm:max-w-2/4 relative bg-[#ffffff] rounded max-h-[90vh] overflow-y-auto p-4 space-y-3"
       >
         <IoCloseCircleOutline
           onClick={() => onClose()}
