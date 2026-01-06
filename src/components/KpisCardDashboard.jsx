@@ -367,7 +367,7 @@ else if (role === "re") {
         icon: ClipboardClock,
       },
       {
-        label: "Received from Cont...",
+        label: "In Progress",
         value: kpiData?.consultant?.consultant_received_from_contractor,
         link: "/consultant/received_from_contractor",
         bg: "from-green-500 to-green-700",

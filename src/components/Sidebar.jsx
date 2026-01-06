@@ -78,7 +78,7 @@ export default function Sidebar() {
           }, // incoming mail
           {
             to: "/consultant/received_from_contractor",
-            label: "Received from Contractor",
+            label: "In Progress",
             icon: FolderDown,
           }, // incoming mail
           {
