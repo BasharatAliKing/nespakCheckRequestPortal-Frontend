@@ -74,6 +74,16 @@ const KpisCardDashboard = ({ refresh }) => {
   if (role === "contractor_rep") {
     statusData = [
       {
+        name: "Approved",
+        value: kpiData?.constractor?.approved ?? 0,
+        color: "#c6005c",
+      },
+      {
+        name: "Not Approved",
+        value: kpiData?.constractor?.rejected ?? 0,
+        color: "#ca3500",
+      },
+      {
         name: "Revert",
         value: kpiData?.constractor?.revert ?? 0,
         color: "#8200db",
@@ -120,6 +130,11 @@ const KpisCardDashboard = ({ refresh }) => {
         name: "Approved",
         value: kpiData?.consultant?.consultant_approved ?? 0,
         color: "#c6005c",
+      },
+      {
+        name: "Rejected",
+        value: kpiData?.consultant?.consultant_rejected ?? 0,
+        color: "#8200db",
       },
       {
         name: "Revert",
