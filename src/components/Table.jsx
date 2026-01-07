@@ -29,11 +29,9 @@ export default function Table({ columns, rows, onEdit, onDelete, onView, searchK
     setSearch(e.target.value)
     setPage(1)
   }
-
   function handlePageChange(newPage) {
     setPage(newPage)
   }
-
   function handlePageSizeChange(e) {
     setCurrentPageSize(Number(e.target.value))
     setPage(1)

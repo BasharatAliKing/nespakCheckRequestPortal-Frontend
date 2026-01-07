@@ -5,6 +5,7 @@ import {
   CircleX,
   ClipboardClock,
   ClipboardEditIcon,
+  Cross,
   FileEdit,
   Folder,
   FolderDown,
@@ -12,6 +13,7 @@ import {
   FolderKanban,
   LoaderPinwheel,
   LoaderPinwheelIcon,
+  LucideLoaderPinwheel,
   Shield,
   ShieldOff,
   Undo2,
@@ -36,7 +38,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
 
 const monthlyData = [
   { month: "Jan", approval: 5 },
@@ -68,191 +69,185 @@ const KpisCardDashboard = ({ refresh }) => {
   const [kpiProjects, setKpiProjects] = useState([]);
   const [kpiMainForm, setKpiMainForm] = useState([]);
   const role = getUserData()?.role || "Guest";
-  let statusData=[];
+  let statusData = [];
 
- if (role === "contractor_rep") {
-  statusData = [
-    {
-      name: "Revert",
-      value: kpiData?.constractor?.revert ?? 0,
-      color: "#8200db",
-    },
-    {
-      name: "InProgress",
-      value: kpiData?.constractor?.received_request ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.constractor?.pending_request ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.constractor?.expired ?? 0,
-      color: "#c10007",
-    },
-    {
-      name: "Received from Consultant",
-      value: kpiData?.constractor?.received_from_consultant ?? 0,
-      color: "#364153",
-    },
-  ];
-} 
-else if (role === "consultant_rep") {
-  statusData = [
-    {
-      name: "Pending",
-      value: kpiData?.consultant?.consultant_pending ?? 0,
-      color: "#facc15",
-    },
-    {
-      name: "Received from Cont...",
-      value: kpiData?.consultant?.consultant_received_from_contractor ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Received from RE",
-      value: kpiData?.consultant?.received_from_re ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Approved",
-      value: kpiData?.consultant?.consultant_approved ?? 0,
-      color: "#c6005c",
-    },
-    {
-      name: "Revert",
-      value: kpiData?.consultant?.consultant_revert ?? 0,
-      color: "#ca3500",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.consultant?.consultant_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
-else if (role === "inspector") {
-  statusData = [
-    {
-      name: "Pass",
-      value: kpiData?.inspector?.inspector_okay ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Fail",
-      value: kpiData?.inspector?.inspector_not_okay ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.inspector?.inspector_pending ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.inspector?.inspector_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
-else if (role === "surveyor") {
-  statusData = [
-    {
-      name: "Pass",
-      value: kpiData?.surveyor?.surveyor_okay ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Fail",
-      value: kpiData?.surveyor?.surveyor_not_okay ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.surveyor?.surveyor_pending ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.surveyor?.surveyor_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
-else if (role === "me") {
-  statusData = [
-    {
-      name: "Pass",
-      value: kpiData?.me?.me_okay ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Fail",
-      value: kpiData?.me?.me_not_okay ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.me?.me_pending ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.me?.me_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
-else if (role === "are") {
-  statusData = [
-    {
-      name: "Pass",
-      value: kpiData?.are?.are_okay ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Fail",
-      value: kpiData?.are?.are_not_okay ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.are?.are_pending ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.are?.are_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
-else if (role === "re") {
-  statusData = [
-    {
-      name: "Pass",
-      value: kpiData?.re?.re_approved ?? 0,
-      color: "#008236",
-    },
-    {
-      name: "Fail",
-      value: kpiData?.re?.re_not_approved ?? 0,
-      color: "#0092b8",
-    },
-    {
-      name: "Pending",
-      value: kpiData?.re?.re_pending ?? 0,
-      color: "#a65f00",
-    },
-    {
-      name: "Expired",
-      value: kpiData?.re?.re_expired ?? 0,
-      color: "#c10007",
-    },
-  ];
-}
+  if (role === "contractor_rep") {
+    statusData = [
+      {
+        name: "Revert",
+        value: kpiData?.constractor?.revert ?? 0,
+        color: "#8200db",
+      },
+      {
+        name: "InProgress",
+        value: kpiData?.constractor?.received_request ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.constractor?.pending_request ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.constractor?.expired ?? 0,
+        color: "#c10007",
+      },
+      {
+        name: "Received from Consultant",
+        value: kpiData?.constractor?.received_from_consultant ?? 0,
+        color: "#364153",
+      },
+    ];
+  } else if (role === "consultant_rep") {
+    statusData = [
+      {
+        name: "Pending",
+        value: kpiData?.consultant?.consultant_pending ?? 0,
+        color: "#facc15",
+      },
+      {
+        name: "In Progress",
+        value: kpiData?.consultant?.consultant_received_from_contractor ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Received from RE",
+        value: kpiData?.consultant?.received_from_re ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Approved",
+        value: kpiData?.consultant?.consultant_approved ?? 0,
+        color: "#c6005c",
+      },
+      {
+        name: "Revert",
+        value: kpiData?.consultant?.consultant_revert ?? 0,
+        color: "#ca3500",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.consultant?.consultant_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  } else if (role === "inspector") {
+    statusData = [
+      {
+        name: "Pass",
+        value: kpiData?.inspector?.inspector_okay ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Fail",
+        value: kpiData?.inspector?.inspector_not_okay ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.inspector?.inspector_pending ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.inspector?.inspector_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  } else if (role === "surveyor") {
+    statusData = [
+      {
+        name: "Pass",
+        value: kpiData?.surveyor?.surveyor_okay ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Fail",
+        value: kpiData?.surveyor?.surveyor_not_okay ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.surveyor?.surveyor_pending ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.surveyor?.surveyor_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  } else if (role === "me") {
+    statusData = [
+      {
+        name: "Pass",
+        value: kpiData?.me?.me_okay ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Fail",
+        value: kpiData?.me?.me_not_okay ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.me?.me_pending ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.me?.me_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  } else if (role === "are") {
+    statusData = [
+      {
+        name: "Pass",
+        value: kpiData?.are?.are_okay ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Fail",
+        value: kpiData?.are?.are_not_okay ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.are?.are_pending ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.are?.are_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  } else if (role === "re") {
+    statusData = [
+      {
+        name: "Pass",
+        value: kpiData?.re?.re_approved ?? 0,
+        color: "#008236",
+      },
+      {
+        name: "Fail",
+        value: kpiData?.re?.re_not_approved ?? 0,
+        color: "#0092b8",
+      },
+      {
+        name: "Pending",
+        value: kpiData?.re?.re_pending ?? 0,
+        color: "#a65f00",
+      },
+      {
+        name: "Expired",
+        value: kpiData?.re?.re_expired ?? 0,
+        color: "#c10007",
+      },
+    ];
+  }
 
   const kpisConfig = {
     admin: [
@@ -336,6 +331,13 @@ else if (role === "re") {
         icon: BadgeCheck,
       },
       {
+        label: "Not Approved Requests",
+        value: kpiData?.constractor?.rejected,
+        link: "/contractor/rejected",
+        bg: "from-orange-500 to-orange-700",
+        icon: CircleX,
+      },
+      {
         label: "Revert Requests",
         value: kpiData?.constractor?.revert,
         link: "/contractor/revert",
@@ -371,9 +373,9 @@ else if (role === "re") {
         value: kpiData?.consultant?.consultant_received_from_contractor,
         link: "/consultant/received_from_contractor",
         bg: "from-green-500 to-green-700",
-        icon: FolderDown,
+        icon: LucideLoaderPinwheel,
       },
-     {
+      {
         label: "Received from RE",
         value: kpiData?.consultant?.consultant_received_from_re,
         link: "/consultant/received_from_re",
@@ -388,11 +390,18 @@ else if (role === "re") {
         icon: Undo2,
       },
       {
-        label: "Approved Requests",
+        label: "Final Approved",
         value: kpiData?.consultant?.consultant_approved,
         link: "/consultant/approved",
         bg: "from-pink-500 to-pink-700",
         icon: BadgeCheck,
+      },
+      {
+        label: "Final Not Approved ",
+        value: kpiData?.consultant?.consultant_rejected,
+        link: "/consultant/rejected",
+        bg: "from-purple-500 to-purple-700",
+        icon: CircleX,
       },
       {
         label: "Expired",
@@ -546,7 +555,7 @@ else if (role === "re") {
         label: "Expired",
         value: kpiData?.are?.are_expired,
         link: "/are/expired",
-          bg: "from-red-500 to-red-700",
+        bg: "from-red-500 to-red-700",
         icon: ShieldOff,
       },
     ],
@@ -583,7 +592,7 @@ else if (role === "re") {
         label: "Expired",
         value: kpiData?.re?.re_expired,
         link: "/re/expired",
-          bg: "from-red-500 to-red-700",
+        bg: "from-red-500 to-red-700",
         icon: ShieldOff,
       },
     ],
@@ -591,9 +600,11 @@ else if (role === "re") {
   const getKpisData = async () => {
     try {
       const url =
-        role === 'consultant_rep'
+        role === "consultant_rep"
           ? `${API_URL}/main-form/contractorkpis`
-          : `${API_URL}/main-form/contractorkpis/${role === 'contractor_rep' ? 'contractor': role}/${getUserData()._id}/`;
+          : `${API_URL}/main-form/contractorkpis/${
+              role === "contractor_rep" ? "contractor" : role
+            }/${getUserData()._id}/`;
       const res = await fetch(url, {
         method: "GET",
         headers: {
@@ -717,30 +728,32 @@ else if (role === "re") {
     <>
       {/* Admin KPI Dashboard */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
-        {kpisConfig[role]?.map((kpi, index) =>{
+        {kpisConfig[role]?.map((kpi, index) => {
           const Icon = kpi.icon;
-        return(
-          <Link
-            to={kpi.link}
-            key={index}
-            className={`bg-gradient-to-r cursor-pointer ${kpi.bg} text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-base font-medium opacity-80">{kpi.label}</p>
-                <h2 className="text-4xl font-bold mt-2">{kpi.value}</h2>
+          return (
+            <Link
+              to={kpi.link}
+              key={index}
+              className={`bg-gradient-to-r cursor-pointer ${kpi.bg} text-white rounded-2xl p-6 shadow-xl hover:scale-105 transition-all duration-200 backdrop-blur-md`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-base font-medium opacity-80">
+                    {kpi.label}
+                  </p>
+                  <h2 className="text-4xl font-bold mt-2">{kpi.value}</h2>
+                </div>
+                <div className="bg-white/20 p-4 rounded-full backdrop-blur">
+                  <Icon className="w-8 h-8 text-white" />
+                </div>
               </div>
-              <div className="bg-white/20 p-4 rounded-full backdrop-blur">
-                <Icon className="w-8 h-8 text-white" />
-              </div>
-            </div>
-          </Link>
-)})}
+            </Link>
+          );
+        })}
       </div>
-    {
-    role !== 'admin' &&
-       <div className=" py-6 space-y-6  flex gap-6">
-        {/* TOP GRID */}
+      {role !== "admin" && (
+        <div className=" py-6 space-y-6  flex gap-6">
+          {/* TOP GRID */}
           {/* STATUS OVERVIEW */}
           <div className="bg-[#ffffff6c] w-[40%] rounded-xl cursor-pointer shadow p-4">
             <h3 className="font-semibold mb-4">Requests Status Overview</h3>
@@ -792,11 +805,12 @@ else if (role === "re") {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div> 
-    }
+        </div>
+      )}
       <img src="/nespaklogo.png" className="ml-auto" width="30%" alt="" />
     </>
   );
 };
+
 
 export default KpisCardDashboard;

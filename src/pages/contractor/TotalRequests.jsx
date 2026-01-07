@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ContractorForm from "../../components/ContractorForm";
 import UpdateConsAfterRe from "../../components/UpdateConsAfterRe";
+import MainPageDesing from "../../components/MainPageDesing";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -431,11 +432,16 @@ const TotalRequests = () => {
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-    const hh = String(now.getHours()).padStart(2, "0");
+
+    let hours = now.getHours();
     const min = String(now.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const hh = String(hours).padStart(2, "0");
 
     const submitDate = `${yyyy}-${mm}-${dd}`;
-    const submitTime = `${hh}:${min}`;
+    const submitTime = `${hh}:${min} ${ampm}`;
 
     const payload = {
       ...(role === "consultant_rep" && {
@@ -568,7 +574,7 @@ const TotalRequests = () => {
       {inspecForm && (
         <div
           onClick={() => setInspecForm(false)}
-          className="fixed inset-0 bg-black/30 grid place-items-center p-4"
+          className="fixed inset-0 bg-black/30 overflow-y-auto grid place-items-center p-4"
         >
           <form
             onClick={(e) => e.stopPropagation()}
@@ -576,7 +582,7 @@ const TotalRequests = () => {
             className="w-full max-w-3/4 bg-white rounded p-4 space-y-3"
           >
             <h3 className="text-lg font-medium">Update CR</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
               <Display label="Project ID" value={selectedRow?.project_title} />
               <Display label="RFI No" value={selectedRow?.rfi_no} />
               <Display
@@ -628,7 +634,8 @@ const TotalRequests = () => {
                 label="Contractor Submit Time"
                 value={selectedRow?.contractor_submit_time || "—"}
               />
-            </div>
+            </div> */}
+            <MainPageDesing viewingRow={selectedRow} />
             <div className="space-y-1">
               <label className="text-sm">Status</label>
               <div className="flex gap-5">
@@ -639,7 +646,7 @@ const TotalRequests = () => {
                     value="okay"
                     onChange={(e) => setStatusValue(e.target.value)}
                   />
-                  Pass
+                  {role === 're' ? 'Approved':'Pass'}
                 </label>
 
                 <label className="flex gap-1 font-medium text-base">
@@ -649,7 +656,7 @@ const TotalRequests = () => {
                     value="not_okay"
                     onChange={(e) => setStatusValue(e.target.value)}
                   />
-                  Fail
+                  {role === 're' ? 'Not Approved':'Fail'}
                 </label>
               </div>
             </div>
@@ -663,12 +670,20 @@ const TotalRequests = () => {
                 placeholder="Enter remarks"
               />
             </div>
-            <button
+         <div className="flex gap-3">
+             <button
               type="submit"
               className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md"
             >
               Submit
             </button>
+            <button
+              className="px-4 py-2 cursor-pointer bg-yellow-600 text-white rounded-md"
+             onClick={() => setInspecForm(false)}
+            >
+              Cancel
+            </button>
+         </div>
           </form>
         </div>
       )}
@@ -862,10 +877,11 @@ const TotalRequests = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
+              className="w-full py-2 cursor-pointer bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
             >
               Submit
             </button>
+           
           </form>
         </div>
       )}

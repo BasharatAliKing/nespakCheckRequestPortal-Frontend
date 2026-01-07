@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Hammer,
   LoaderPinwheel,
+  LucideLoaderPinwheel,
   Shield,
   ShieldOff,
   Undo2,
@@ -58,6 +59,11 @@ export default function Sidebar() {
             label: "Approved Requests",
             icon: BadgeCheck,
           }, // hourglass
+          {
+            to: "/contractor/rejected",
+            label: "Not Approved Requests",
+            icon: CircleX,
+          }, // hourglass
           { to: "/contractor/revert", label: "Revert Requests", icon: Undo2 }, // hourglass
           {
             to: "/contractor/expired",
@@ -79,14 +85,15 @@ export default function Sidebar() {
           {
             to: "/consultant/received_from_contractor",
             label: "In Progress",
-            icon: FolderDown,
+            icon: LucideLoaderPinwheel,
           }, // incoming mail
           {
             to: "/consultant/received_from_re",
             label: "Received from RE",
             icon: FolderDown,
           }, // approved
-          { to: "/consultant/approved", label: "Approved", icon: BadgeCheck },
+          { to: "/consultant/approved", label: "Approved Requests", icon: BadgeCheck },
+          { to: "/consultant/rejected", label: "Rejected Requests", icon: CircleX },
           { to: "/consultant/revert", label: "Revert", icon: Undo2 },
           { to: "/consultant/expired", label: "Expired", icon: ShieldOff }, // time over
         ]

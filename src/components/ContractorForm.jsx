@@ -105,7 +105,13 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
     e.preventDefault();
     const now = new Date();
     const submitDate = now.toISOString().split("T")[0];
-    const submitTime = now.toTimeString().slice(0, 5);
+    let hours = now.getHours();
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hh = String(hours).padStart(2, "0");
+    const submitTime = `${hh}:${min} ${ampm}`;
 
     try {
       const res = await fetch(`${API_URL}/main-form`, {
@@ -142,7 +148,13 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
 
     const now = new Date();
     const submitDate = now.toISOString().split("T")[0];
-    const submitTime = now.toTimeString().slice(0, 5);
+    let hours = now.getHours();
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hh = String(hours).padStart(2, "0");
+    const submitTime = `${hh}:${min} ${ampm}`;
 
     try {
       const res = await fetch(`${API_URL}/main-form/${data._id}`, {
@@ -174,7 +186,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       console.log(err);
     }
   };
-
+ console.log(formDate);
   return (
     <div
       onClick={() => onClose()}
