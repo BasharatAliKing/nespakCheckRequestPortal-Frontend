@@ -49,7 +49,10 @@ const [showPassword, setShowPassword] = useState(false)
         <img src="/card-bg.png" className='absolute rounded-md inset-0 h-full w-full  z-0' alt="" />
           {/* Content (TOP) */}
   <div className="relative z-10 space-y-4">
+    <div className="flex mx-auto ml-5 w-full gap-2">
     <img src="/icon.png" className="h-20 w-20 mx-auto" alt="icon" />
+    <h1 className='text-lg leading-tight text-white font-bold'><span className='text-2xl'>NESPAK</span> <br /> Check Request Portal</h1>
+    </div>
     {error && <div className="text-red-400 text-sm">{error}</div>}
     <div className="flex flex-col gap-1">
       <label className="text-sm text-white font-medium">Email</label>
