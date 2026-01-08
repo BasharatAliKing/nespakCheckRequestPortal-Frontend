@@ -60,7 +60,6 @@ const [showPassword, setShowPassword] = useState(false)
         type="email"
         className="w-full bg-white rounded px-3 py-[5px] outline-none focus:ring-2 focus:ring-[#1e5392]"
         value={email}
-        name='email'
         onChange={(e) => setEmail(e.target.value)}
         required
       />
@@ -73,7 +72,6 @@ const [showPassword, setShowPassword] = useState(false)
       type={showPassword ? 'text' : 'password'}
       className="w-full bg-white rounded px-3 pr-10 py-[5px] outline-none focus:ring-2 focus:ring-[#1e5392]"
       value={password}
-      name='password'
       onChange={(e) => setPassword(e.target.value)}
       required
     />
@@ -115,7 +113,7 @@ const [showPassword, setShowPassword] = useState(false)
       </form>
     </div>
     <img src="/man.png" className='absolute bottom-0 left-5 opacity-60' width="10%" alt="" />
-    <img src="/nespaklogo.png" width="20%"  className='absolute bottom-5 right-5' alt="" />
+    <img src="/nespakloginlogo.png" width="20%"  className='absolute bottom-5 right-5' alt="" />
      </div>
   )
 }
