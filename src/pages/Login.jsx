@@ -60,6 +60,7 @@ const [showPassword, setShowPassword] = useState(false)
         type="email"
         className="w-full bg-white rounded px-3 py-[5px] outline-none focus:ring-2 focus:ring-[#1e5392]"
         value={email}
+        name='email'
         onChange={(e) => setEmail(e.target.value)}
         required
       />
@@ -72,6 +73,7 @@ const [showPassword, setShowPassword] = useState(false)
       type={showPassword ? 'text' : 'password'}
       className="w-full bg-white rounded px-3 pr-10 py-[5px] outline-none focus:ring-2 focus:ring-[#1e5392]"
       value={password}
+      name='password'
       onChange={(e) => setPassword(e.target.value)}
       required
     />

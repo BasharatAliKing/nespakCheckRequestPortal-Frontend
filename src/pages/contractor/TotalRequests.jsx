@@ -255,8 +255,15 @@ const TotalRequests = () => {
         }
       },
     });
-  } else {
+  }
+   else {
     // ➤ Add common fields
+    if (role === 'contractor_rep'){
+    columns.push(
+      {key:"contractor_submit_date", header:"Date of Submission"},
+      {key:"contractor_submit_time", header:"Time of Submission"}
+    )
+  }else
     columns.push(
       { key: "consultant_update_date", header: "Date of Submission" },
       { key: "consultant_update_time", header: "Time of Submission" }
