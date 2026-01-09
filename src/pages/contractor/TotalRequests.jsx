@@ -17,7 +17,7 @@ const Display = ({ label, value }) => (
     <p className="font-semibold capitalize">{value}</p>
   </div>
 );
-const TotalRequests = () => {
+const TotalRequests = ({refresh,setRefresh}) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [revertMode, setRevertMode] = useState(false);
   const [showConsultantForm, setShowConsultantForm] = useState(false);
@@ -539,6 +539,7 @@ const TotalRequests = () => {
         // 🔥 Reload API after 1 seconds
         setTimeout(() => {
           listQuery.refetch();
+          if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
         }, 1000);
       }
     } catch (err) {
@@ -571,7 +572,7 @@ const TotalRequests = () => {
           options={options}
         />
       </div>
-      <Table
+      <Table 
         columns={columns}
         rows={rows}
         searchKey="rfi_no"
@@ -864,7 +865,6 @@ const TotalRequests = () => {
                 </div>
               </div>
             )}
-
             {/* ------------------------------------------------------------------ */}
             {/* REMARKS (show when revert button selected) */}
             {/* ------------------------------------------------------------------ */}
@@ -899,6 +899,7 @@ const TotalRequests = () => {
           onClose={() => {
             setTimeout(() => {
               listQuery.refetch();
+              if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
             }, 1000);
             setRevertContractor(false);
           }}
@@ -909,6 +910,7 @@ const TotalRequests = () => {
           hideConsAfterRe={() => {
             setTimeout(() => {
               listQuery.refetch();
+              if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
             }, 1000);
             setShowConsultantReceiveForm(false);
           }}

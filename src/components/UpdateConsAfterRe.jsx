@@ -11,7 +11,7 @@ const Display = ({ label, value }) => (
     </p>
   </div>
 );
-const UpdateConsAfterRe = ({ selectedRow, hideConsAfterRe }) => {
+const UpdateConsAfterRe = ({selectedRow, hideConsAfterRe }) => {
   const role = getUserData()?.role || "";
   async function handlesubmit(e) {
     e.preventDefault();

@@ -186,7 +186,6 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       console.log(err);
     }
   };
- console.log(formDate);
   return (
     <div
       onClick={() => onClose()}

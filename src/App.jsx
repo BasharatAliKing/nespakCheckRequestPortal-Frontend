@@ -16,9 +16,11 @@ import KpisPage from './pages/KpisPage.jsx'
 import { isAuthenticated, getUserRole } from './utilities/auth.js'
 import Dashboard from './pages/Dashboard.jsx'
 import TotalRequests from './pages/contractor/TotalRequests.jsx'
+import { useState } from 'react'
 
 function App() {
   const role = getUserRole();
+  const [kpiRefreshKey, setKpiRefreshKey] = useState(0); // 🔥 NEW
   return (
     <>
       <Routes>
@@ -32,8 +34,8 @@ function App() {
   }
 >
   <Route index element={<Navigate to="home" replace />} />
-  <Route path="home" element={<Dashboard />} />
-  <Route path='/:type/:status' element={<TotalRequests />} />
+  <Route path="home" element={<Dashboard refresh={kpiRefreshKey} setRefresh={setKpiRefreshKey} />} />
+  <Route path='/:type/:status' element={<TotalRequests refresh={kpiRefreshKey} setRefresh={setKpiRefreshKey} />} />
   <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
   <Route path="clients" element={<AdminRoute><ClientsPage /></AdminRoute>} />
   <Route path="contractors" element={<AdminRoute><ContractorsPage /></AdminRoute>} />

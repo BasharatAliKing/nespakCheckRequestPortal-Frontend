@@ -4,11 +4,9 @@ import KpisCardDashboard from "../components/KpisCardDashboard";
 import MainFormPage from "./MainFormPage";
 import ContractorForm from "../components/ContractorForm";
 const API_URL = import.meta.env.VITE_API_URL;
-const Dashboard = () => {
+const Dashboard = ({ refresh, setRefresh }) => {
   const role = getUserData()?.role || "Guest";
   const [showMainForm, setShowMainForm] = useState(false);
-  const [kpiRefreshKey, setKpiRefreshKey] = useState(0); // 🔥 NEW
-
   return (
     <>
       {/* Page Title */}
@@ -34,12 +32,12 @@ const Dashboard = () => {
           onClose={() => {
             setShowMainForm(false);
             // 🔥 trigger KPI reload
-            setKpiRefreshKey((prev) => prev + 1);
+            setRefresh((prev) => prev + 1);
           }}
         />
       )}
       {/* KPI Cards */}
-      <KpisCardDashboard refresh={kpiRefreshKey} />
+      <KpisCardDashboard refresh={refresh} />
     </>
   );
 };
