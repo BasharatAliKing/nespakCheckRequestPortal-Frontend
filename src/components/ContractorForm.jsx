@@ -5,9 +5,10 @@ import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const ContractorForm = ({ onClose, data, mode = "create"  }) => {
+const ContractorForm = ({ onClose, data, mode = "create" }) => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
+  const [boqType, setBoqType] = useState("boq"); // "boq" | "nonboq"
 
   const [formDate, setFormDate] = useState({
     project_id: "",
@@ -21,6 +22,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
     type_of_activity: "",
     bill_no: "",
     boq_item_no: "",
+    non_boq_item:"",
     drawing_ref_no: "",
     contractor_name: `${getUserData()?.user_name || ""}`,
     contractor_submit_date: "",
@@ -43,6 +45,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
         type_of_activity: data.type_of_activity || "",
         bill_no: data.bill_no || "",
         boq_item_no: data.boq_item_no || "",
+        non_boq_item:data.non_boq_item || "",
         drawing_ref_no: data.drawing_ref_no || "",
         contractor_name: data.contractor_name || "",
         contractor_submit_date: data.contractor_submit_date || "",
@@ -61,8 +64,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
 
     const count = listMainForm.filter(
       (f) =>
-        f.project_id === projectId &&
-        f.date_of_rfi?.split("T")[0] === today
+        f.project_id === projectId && f.date_of_rfi?.split("T")[0] === today
     ).length;
 
     return `${y}${m}${d}-${String(count + 1).padStart(2, "0")}`;
@@ -122,7 +124,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
         },
         body: JSON.stringify({
           ...formDate,
-          selected_contractor:getUserData()._id,
+          selected_contractor: getUserData()._id,
           contractor_submit_date: submitDate,
           contractor_submit_time: submitTime,
         }),
@@ -135,7 +137,6 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       } else {
         toast.success("RFI submitted successfully");
         onClose();
-       
       }
     } catch (err) {
       console.log(err);
@@ -163,12 +164,12 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-       body: JSON.stringify({
+        body: JSON.stringify({
           ...formDate,
-          selected_contractor:getUserData()._id,
-          contractor_status:"pending",
-          consultant_status:"pending",
-          consultant_remarks:"",
+          selected_contractor: getUserData()._id,
+          contractor_status: "pending",
+          consultant_status: "pending",
+          consultant_remarks: "",
           contractor_submit_date: submitDate,
           contractor_submit_time: submitTime,
         }),
@@ -192,7 +193,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
       className="fixed inset-0 z-50 bg-[#00000061] grid place-items-center p-4"
     >
       <form
-         onSubmit={mode === "create" ? handleCreate : handleUpdate}
+        onSubmit={mode === "create" ? handleCreate : handleUpdate}
         onClick={(e) => e.stopPropagation()}
         className="w-full sm:max-w-2/4 relative bg-[#ffffff] rounded max-h-[90vh] overflow-y-auto p-4 space-y-3"
       >
@@ -200,10 +201,11 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
           onClick={() => onClose()}
           className="absolute text-2xl top-3 right-3 cursor-pointer"
         />
-        <h3 className="text-lg font-medium">{mode ==='create' ? 'Create RFI' : 'Update RFI'}</h3>
+        <h3 className="text-lg font-medium">
+          {mode === "create" ? "Create RFI" : "Update RFI"}
+        </h3>
         {/* Consultant Remarks for update RFI contractor */}
-       {
-        mode === 'edit' && (
+        {mode === "edit" && (
           <div className="space-y-1">
             <label className="text-sm">Consultant Remarks</label>
             <input
@@ -212,8 +214,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
               className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        )
-       }
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Select Project */}
           <div className="space-y-1 flex flex-col text-black">
@@ -234,7 +235,7 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
 
           {/* RFI No */}
           <div className="space-y-1">
-            <label className="text-sm">RFI No</label>
+            <label className="text-sm">Check Request No</label>
             <input
               type="text"
               value={formDate.rfi_no}
@@ -376,19 +377,63 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
               className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
-          {/* BOQ Item No */}
-          <div className="space-y-1">
-            <label className="text-sm">BOQ Item No</label>
-            <input
-              type="text"
-              value={formDate.boq_item_no}
-              onChange={(e) =>
-                setFormDate((s) => ({ ...s, boq_item_no: e.target.value }))
-              }
-              className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="space-y-1 col-span-2">
+            <label className="text-sm">Select Item</label>
+            <div className="flex gap-5 mt-2">
+              <label className="flex gap-1 font-medium text-sm items-center">
+                <input
+                  type="radio"
+                  name="boqType"
+                  value="boq"
+                  checked={boqType === "boq"}
+                  onChange={(e) => setBoqType(e.target.value)}
+                  className="cursor-pointer"
+                />
+                BOQ Item
+              </label>
+              <label className="flex gap-1 font-medium text-sm items-center">
+                <input
+                  type="radio"
+                  name="boqType"
+                  value="nonboq"
+                  checked={boqType === "nonboq"}
+                  onChange={(e) => setBoqType(e.target.value)}
+                  className="cursor-pointer"
+                />
+                Non BOQ Item
+              </label>
+            </div>
           </div>
+          {/* BOQ Item No */}
+          {boqType === "boq" && (
+            <div className="space-y-1">
+              <label className="text-sm">BOQ Item No</label>
+              <input
+                type="text"
+                value={formDate.boq_item_no}
+                required
+                onChange={(e) =>
+                  setFormDate((s) => ({ ...s, boq_item_no: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+          {/* NonBOQ Item No */}
+          {boqType === "nonboq" && (
+            <div className="space-y-1">
+              <label className="text-sm">Non BOQ Item </label>
+              <input
+                type="text"
+                value={formDate.non_boq_item}
+                required
+                onChange={(e) =>
+                  setFormDate((s) => ({ ...s, non_boq_item: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
 
           {/* Drawing Ref No */}
           <div className="space-y-1">
@@ -408,12 +453,18 @@ const ContractorForm = ({ onClose, data, mode = "create"  }) => {
 
           <div className="col-span-2 flex gap-3">
             {mode === "create" && (
-              <button type="submit" className="cursor-pointer bg-blue-600 text-white p-2 rounded w-full">
+              <button
+                type="submit"
+                className="cursor-pointer bg-blue-600 text-white p-2 rounded w-full"
+              >
                 Submit
               </button>
             )}
             {mode === "edit" && (
-              <button type="submit" className="cursor-pointer bg-green-600 text-white p-2 rounded w-full">
+              <button
+                type="submit"
+                className="cursor-pointer bg-green-600 text-white p-2 rounded w-full"
+              >
                 Update
               </button>
             )}
