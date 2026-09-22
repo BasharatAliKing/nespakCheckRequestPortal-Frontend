@@ -29,7 +29,7 @@ const [showPassword, setShowPassword] = useState(false)
         const text = await res.text()
         throw new Error(text || `Login failed: ${res.status}`)
       }
-      const data = await res.json()
+      const data = await res.json();
       const token = data?.token || data?.access_token || ''
       if (!token) throw new Error('Invalid login response')
       userData(data?.user);
