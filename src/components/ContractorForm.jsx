@@ -9,7 +9,8 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
   const [boqType, setBoqType] = useState("boq"); // "boq" | "nonboq"
-
+  const [contractorAttachments, setContractorAttachments] = useState([]);
+const [isSubmitting, setIsSubmitting] = useState(false);
   const [formDate, setFormDate] = useState({
     project_id: "",
     rfi_no: "",
@@ -103,90 +104,137 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
   };
 
   /* ---------------- CREATE (POST) ---------------- */
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    const now = new Date();
-    const submitDate = now.toISOString().split("T")[0];
-    let hours = now.getHours();
-    const min = String(now.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const hh = String(hours).padStart(2, "0");
-    const submitTime = `${hh}:${min} ${ampm}`;
+const handleCreate = async (e) => {
+  e.preventDefault();
+  if (isSubmitting) return;
 
-    try {
-      const res = await fetch(`${API_URL}/main-form`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({
-          ...formDate,
-          selected_contractor: getUserData()._id,
-          contractor_submit_date: submitDate,
-          contractor_submit_time: submitTime,
-        }),
-      });
+  setIsSubmitting(true);
+  const now = new Date();
+  const submitDate = now.toISOString().split("T")[0];
 
-      const result = await res.json();
+  let hours = now.getHours();
+  const min = String(now.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
 
-      if (!res.ok) {
-        toast.error(result.message || "Failed to submit");
-      } else {
-        toast.success("RFI submitted successfully");
-        onClose();
-      }
-    } catch (err) {
-      console.log(err);
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  const hh = String(hours).padStart(2, "0");
+  const submitTime = `${hh}:${min} ${ampm}`;
+
+  try {
+    const formData = new FormData();
+
+    Object.entries(formDate).forEach(([key, value]) => {
+  // Skip fields that we are setting separately
+  if (
+    key === "contractor_submit_date" ||
+    key === "contractor_submit_time"
+  ) {
+    return;
+  }
+
+  formData.append(key, value ?? "");
+});
+
+formData.append("selected_contractor", getUserData()._id);
+
+formData.append("contractor_submit_date", submitDate);
+formData.append("contractor_submit_time", submitTime);
+    // Add multiple attachments
+    contractorAttachments.forEach((file) => {
+      formData.append("contractor_attachments", file);
+    });
+
+    const res = await fetch(`${API_URL}/main-form`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: formData,
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      toast.error(result.message || "Failed to submit");
+    } else {
+      toast.success("RFI submitted successfully");
+      onClose();
     }
-  };
+  } catch (err) {
+    console.log(err);
+    toast.error("Something went wrong");
+  }
+};
 
   /* ---------------- UPDATE (PUT) ---------------- */
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+const handleUpdate = async (e) => {
+  e.preventDefault();
 
-    const now = new Date();
-    const submitDate = now.toISOString().split("T")[0];
-    let hours = now.getHours();
-    const min = String(now.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const hh = String(hours).padStart(2, "0");
-    const submitTime = `${hh}:${min} ${ampm}`;
+  const now = new Date();
+  const submitDate = now.toISOString().split("T")[0];
 
-    try {
-      const res = await fetch(`${API_URL}/main-form/${data._id}`, {
+  let hours = now.getHours();
+  const min = String(now.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+
+  const hh = String(hours).padStart(2, "0");
+  const submitTime = `${hh}:${min} ${ampm}`;
+
+  try {
+    const formData = new FormData();
+
+
+Object.entries(formDate).forEach(([key, value]) => {
+  if (
+    key !== "contractor_submit_date" &&
+    key !== "contractor_submit_time"
+  ) {
+    formData.append(key, value ?? "");
+  }
+});
+
+formData.append("selected_contractor", getUserData()._id);
+formData.append("contractor_submit_date", submitDate);
+formData.append("contractor_submit_time", submitTime);
+
+contractorAttachments.forEach((file) => {
+  formData.append("contractor_attachments", file);
+});
+
+    // Multiple attachments
+    contractorAttachments.forEach((file) => {
+      formData.append("contractor_attachments", file);
+    });
+
+    const res = await fetch(
+      `${API_URL}/main-form/${data._id}`,
+      {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({
-          ...formDate,
-          selected_contractor: getUserData()._id,
-          contractor_status: "pending",
-          consultant_status: "pending",
-          consultant_remarks: "",
-          contractor_submit_date: submitDate,
-          contractor_submit_time: submitTime,
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        toast.error(result.message || "Update failed");
-      } else {
-        toast.success("RFI updated successfully");
-        onClose();
+        body: formData,
       }
-    } catch (err) {
-      console.log(err);
+    );
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      toast.error(result.message || "Update failed");
+    } else {
+      toast.success("RFI updated successfully");
+      onClose();
     }
-  };
+  } catch (err) {
+    console.log(err);
+    toast.error("Something went wrong");
+  }
+};
   return (
     <div
       onClick={() => onClose()}
@@ -450,15 +498,68 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
               className="w-full border border-gray-300 rounded px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+{/* Contractor Attachments */}
+<div className="col-span-2 space-y-2">
+  <label className="text-sm font-medium">
+    Attachments
+  </label>
 
+  <input
+    type="file"
+    multiple
+    onChange={(e) => {
+      setContractorAttachments(Array.from(e.target.files));
+    }}
+    className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {contractorAttachments.length > 0 && (
+    <div className="space-y-1 mt-2">
+      {contractorAttachments.map((file, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded"
+        >
+          <span className="text-sm truncate">
+            {file.name}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              setContractorAttachments((prev) =>
+                prev.filter((_, i) => i !== index)
+              );
+            }}
+            className="text-red-500 text-sm ml-3"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
           <div className="col-span-2 flex gap-3">
             {mode === "create" && (
-              <button
-                type="submit"
-                className="cursor-pointer bg-blue-600 text-white p-2 rounded w-full"
-              >
-                Submit
-              </button>
+             <button
+  type="submit"
+  disabled={isSubmitting}
+  className={`text-white p-2 rounded w-full flex items-center justify-center gap-2 ${
+    isSubmitting
+      ? "bg-blue-400 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+  }`}
+>
+  {isSubmitting ? (
+    <>
+      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      Submitting...
+    </>
+  ) : (
+    "Submit"
+  )}
+</button>
             )}
             {mode === "edit" && (
               <button
