@@ -56,20 +56,33 @@ const [isSubmitting, setIsSubmitting] = useState(false);
   }, [mode, data]);
 
   /* ---------------- GENERATE RFI NO ---------------- */
-  const makeRfiNo = (projectId) => {
-    const date = new Date();
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    const today = `${y}-${m}-${d}`;
+const makeRfiNo = (projectId) => {
+  const date = new Date();
 
-    const count = listMainForm.filter(
-      (f) =>
-        f.project_id === projectId && f.date_of_rfi?.split("T")[0] === today
-    ).length;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
 
-    return `${y}${m}${d}-${String(count + 1).padStart(2, "0")}`;
-  };
+  const today = `${y}-${m}-${d}`;
+
+  const count = listMainForm.filter((f) => {
+    const existingProjectId =
+      typeof f.project_id === "object"
+        ? f.project_id?._id
+        : f.project_id;
+
+    const existingDate = f.date_of_rfi
+      ? f.date_of_rfi.split("T")[0]
+      : "";
+
+    return (
+      String(existingProjectId) === String(projectId) &&
+      existingDate === today
+    );
+  }).length;
+
+  return `${y}${m}${d}-${String(count + 1).padStart(2, "0")}`;
+};
 
   /* ---------------- API CALLS ---------------- */
   const fetchProjects = async () => {
