@@ -17,7 +17,8 @@ const Display = ({ label, value }) => (
     <p className="font-semibold capitalize">{value}</p>
   </div>
 );
-const TotalRequests = ({refresh,setRefresh}) => {
+const TotalRequests = ({ refresh, setRefresh }) => {
+  const [attachments, setAttachments] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
   const [revertMode, setRevertMode] = useState(false);
   const [showConsultantForm, setShowConsultantForm] = useState(false);
@@ -94,12 +95,12 @@ const TotalRequests = ({refresh,setRefresh}) => {
                 getUserData()._id
               }`
           : role === "consultant_rep"
-          ? `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`
-          : `${API_URL}/main-form/status/${
-              type === "contractor_rep" ? "contractor" : type
-            }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-              getUserData()._id
-            }`;
+            ? `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`
+            : `${API_URL}/main-form/status/${
+                type === "contractor_rep" ? "contractor" : type
+              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+                getUserData()._id
+              }`;
       const res = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -149,7 +150,7 @@ const TotalRequests = ({refresh,setRefresh}) => {
   if (role === "consultant_rep") {
     columns.push(
       { key: "contractor_submit_date", header: "Date of Submission" },
-      { key: "contractor_submit_time", header: "Time of Submission" }
+      { key: "contractor_submit_time", header: "Time of Submission" },
     );
     columns.push({
       key: "actions",
@@ -255,19 +256,18 @@ const TotalRequests = ({refresh,setRefresh}) => {
         }
       },
     });
-  }
-   else {
+  } else {
     // ➤ Add common fields
-    if (role === 'contractor_rep'){
-    columns.push(
-      {key:"contractor_submit_date", header:"Date of Submission"},
-      {key:"contractor_submit_time", header:"Time of Submission"}
-    )
-  }else
-    columns.push(
-      { key: "consultant_update_date", header: "Date of Submission" },
-      { key: "consultant_update_time", header: "Time of Submission" }
-    );
+    if (role === "contractor_rep") {
+      columns.push(
+        { key: "contractor_submit_date", header: "Date of Submission" },
+        { key: "contractor_submit_time", header: "Time of Submission" },
+      );
+    } else
+      columns.push(
+        { key: "consultant_update_date", header: "Date of Submission" },
+        { key: "consultant_update_time", header: "Time of Submission" },
+      );
     columns.push({
       key: "actions",
       header: "Actions",
@@ -521,14 +521,40 @@ const TotalRequests = ({refresh,setRefresh}) => {
       }),
     };
     try {
+        const formData = new FormData();
+
+  // Add all normal fields
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value);
+    }
+  });
+
+  // Role-specific attachment field
+  const attachmentFieldMap = {
+    inspector: "inspector_attachments",
+    surveyor: "surveyor_attachments",
+    me: "me_attachments",
+    are: "are_attachments",
+    re: "re_attachments",
+  };
+
+  const attachmentField = attachmentFieldMap[role];
+
+  if (attachmentField) {
+    attachments.forEach((file) => {
+      formData.append(attachmentField, file);
+    });
+  }
       const res = await fetch(`${API_URL}/main-form/${selectedRow.id}/`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
+       //   "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify(payload),
+        body: formData,
       });
+        const data = await res.json();
       if (res.ok) {
         toast.success("Status updated successfully");
         // 🔥 Close modal
@@ -539,7 +565,7 @@ const TotalRequests = ({refresh,setRefresh}) => {
         // 🔥 Reload API after 1 seconds
         setTimeout(() => {
           listQuery.refetch();
-          if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
+          if (typeof setRefresh === "function") setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
         }, 1000);
       }
     } catch (err) {
@@ -572,7 +598,7 @@ const TotalRequests = ({refresh,setRefresh}) => {
           options={options}
         />
       </div>
-      <Table 
+      <Table
         columns={columns}
         rows={rows}
         searchKey="rfi_no"
@@ -654,7 +680,7 @@ const TotalRequests = ({refresh,setRefresh}) => {
                     value="okay"
                     onChange={(e) => setStatusValue(e.target.value)}
                   />
-                  {role === 're' ? 'Approved':'Pass'}
+                  {role === "re" ? "Approved" : "Pass"}
                 </label>
 
                 <label className="flex gap-1 font-medium text-base">
@@ -664,7 +690,7 @@ const TotalRequests = ({refresh,setRefresh}) => {
                     value="not_okay"
                     onChange={(e) => setStatusValue(e.target.value)}
                   />
-                  {role === 're' ? 'Not Approved':'Fail'}
+                  {role === "re" ? "Not Approved" : "Fail"}
                 </label>
               </div>
             </div>
@@ -678,20 +704,61 @@ const TotalRequests = ({refresh,setRefresh}) => {
                 placeholder="Enter remarks"
               />
             </div>
-         <div className="flex gap-3">
-             <button
-              type="submit"
-              className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md"
-            >
-              Submit
-            </button>
-            <button
-              className="px-4 py-2 cursor-pointer bg-yellow-600 text-white rounded-md"
-             onClick={() => setInspecForm(false)}
-            >
-              Cancel
-            </button>
-         </div>
+<div className="space-y-2">
+  <label className="text-sm font-medium">
+    Attachments
+  </label>
+
+  <input
+    type="file"
+    multiple
+    onChange={(e) => {
+      setAttachments(Array.from(e.target.files));
+    }}
+    className="w-full p-2 border border-gray-300 rounded-md"
+  />
+
+  {attachments.length > 0 && (
+    <div className="space-y-2 mt-2">
+      {attachments.map((file, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between gap-3 px-3 py-2 bg-gray-50 border rounded-md"
+        >
+          <span className="text-sm truncate">
+            📎 {file.name}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              setAttachments((prev) =>
+                prev.filter((_, i) => i !== index)
+              );
+            }}
+            className="text-sm text-red-600 hover:text-red-800"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md"
+              >
+                Submit
+              </button>
+              <button
+                className="px-4 py-2 cursor-pointer bg-yellow-600 text-white rounded-md"
+                onClick={() => setInspecForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -888,7 +955,6 @@ const TotalRequests = ({refresh,setRefresh}) => {
             >
               Submit
             </button>
-           
           </form>
         </div>
       )}
@@ -899,7 +965,8 @@ const TotalRequests = ({refresh,setRefresh}) => {
           onClose={() => {
             setTimeout(() => {
               listQuery.refetch();
-              if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
+              if (typeof setRefresh === "function")
+                setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
             }, 1000);
             setRevertContractor(false);
           }}
@@ -910,7 +977,8 @@ const TotalRequests = ({refresh,setRefresh}) => {
           hideConsAfterRe={() => {
             setTimeout(() => {
               listQuery.refetch();
-              if (typeof setRefresh === 'function') setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
+              if (typeof setRefresh === "function")
+                setRefresh((prev) => prev + 1); // 🔥 KPI refresh for all roles
             }, 1000);
             setShowConsultantReceiveForm(false);
           }}
