@@ -521,40 +521,40 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       }),
     };
     try {
-        const formData = new FormData();
+      const formData = new FormData();
 
-  // Add all normal fields
-  Object.entries(payload).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      formData.append(key, value);
-    }
-  });
+      // Add all normal fields
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value);
+        }
+      });
 
-  // Role-specific attachment field
-  const attachmentFieldMap = {
-    inspector: "inspector_attachments",
-    surveyor: "surveyor_attachments",
-    me: "me_attachments",
-    are: "are_attachments",
-    re: "re_attachments",
-  };
+      // Role-specific attachment field
+      const attachmentFieldMap = {
+        inspector: "inspector_attachments",
+        surveyor: "surveyor_attachments",
+        me: "me_attachments",
+        are: "are_attachments",
+        re: "re_attachments",
+      };
 
-  const attachmentField = attachmentFieldMap[role];
+      const attachmentField = attachmentFieldMap[role];
 
-  if (attachmentField) {
-    attachments.forEach((file) => {
-      formData.append(attachmentField, file);
-    });
-  }
+      if (attachmentField) {
+        attachments.forEach((file) => {
+          formData.append(attachmentField, file);
+        });
+      }
       const res = await fetch(`${API_URL}/main-form/${selectedRow.id}/`, {
         method: "PUT",
         headers: {
-       //   "Content-Type": "application/json",
+          //   "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
         body: formData,
       });
-        const data = await res.json();
+      // const data = await res.json();
       if (res.ok) {
         toast.success("Status updated successfully");
         // 🔥 Close modal
@@ -704,47 +704,43 @@ const TotalRequests = ({ refresh, setRefresh }) => {
                 placeholder="Enter remarks"
               />
             </div>
-<div className="space-y-2">
-  <label className="text-sm font-medium">
-    Attachments
-  </label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Attachments</label>
 
-  <input
-    type="file"
-    multiple
-    onChange={(e) => {
-      setAttachments(Array.from(e.target.files));
-    }}
-    className="w-full p-2 border border-gray-300 rounded-md"
-  />
+              <input
+                type="file"
+                multiple
+                onChange={(e) => {
+                  setAttachments(Array.from(e.target.files));
+                }}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
 
-  {attachments.length > 0 && (
-    <div className="space-y-2 mt-2">
-      {attachments.map((file, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between gap-3 px-3 py-2 bg-gray-50 border rounded-md"
-        >
-          <span className="text-sm truncate">
-            📎 {file.name}
-          </span>
+              {attachments.length > 0 && (
+                <div className="space-y-2 mt-2">
+                  {attachments.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between gap-3 px-3 py-2 bg-gray-50 border rounded-md"
+                    >
+                      <span className="text-sm truncate">📎 {file.name}</span>
 
-          <button
-            type="button"
-            onClick={() => {
-              setAttachments((prev) =>
-                prev.filter((_, i) => i !== index)
-              );
-            }}
-            className="text-sm text-red-600 hover:text-red-800"
-          >
-            Remove
-          </button>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAttachments((prev) =>
+                            prev.filter((_, i) => i !== index),
+                          );
+                        }}
+                        className="text-sm text-red-600 hover:text-red-800"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex gap-3">
               <button
                 type="submit"
