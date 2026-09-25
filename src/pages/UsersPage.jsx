@@ -96,22 +96,31 @@ export default function UsersPage() {
     //    onError: handleError
   });
 
-  const updateMut = useMutation({
-    mutationFn: async (data) => {
-      const res = await fetch(`${API_URL}/users/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to update user");
-      return res.json();
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey });
-      handleSuccess("User updated successfully!");
-    },
-    //  onError: handleError
-  });
+const updateMut = useMutation({
+  mutationFn: async (data) => {
+    const res = await fetch(`${API_URL}/users/${editingId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(),
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to update user");
+    }
+
+    return result;
+  },
+
+  onSuccess: () => {
+    qc.invalidateQueries({ queryKey });
+    handleSuccess("User updated successfully!");
+  },
+});
   const deleteMut = useMutation({
     mutationFn: async (row) => {
       const res = await fetch(`${API_URL}/users/${row._id}`, {
@@ -144,19 +153,28 @@ export default function UsersPage() {
     setFormOpen(true);
   }
 
-  function openEdit(row) {
-    setEditingId(row._id);
-    setFormData({
-      user_name: row.user_name || "",
-      user_email: row.user_email || "",
-      user_password: "", // Don't populate password on edit
-      role: row.role || "user",
-      user_projects: row.user_projects || [],
-      time_duration: row.time_duration || "1",
-    });
-    setFormOpen(true);
-  }
+function openEdit(row) {
+  setEditingId(row._id);
 
+  const projectIds = Array.isArray(row.user_projects)
+    ? row.user_projects.map((project) =>
+        typeof project === "object"
+          ? project._id
+          : project
+      )
+    : [];
+
+  setFormData({
+    user_name: row.user_name || "",
+    user_email: row.user_email || "",
+    user_password: "",
+    role: row.role || "user",
+    user_projects: projectIds,
+    time_duration: String(row.time_duration || "1"),
+  });
+
+  setFormOpen(true);
+}
   function closeForm() {
     setFormOpen(false);
   }
