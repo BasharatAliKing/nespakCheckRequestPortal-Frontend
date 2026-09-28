@@ -11,6 +11,9 @@ import MainPageDesing from "../../components/MainPageDesing";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+const getId = (value) =>
+  typeof value === "object" && value !== null ? value._id || value.id : value;
+
 const Display = ({ label, value }) => (
   <div>
     <p className="text-xs text-gray-500">{label}</p>
@@ -26,7 +29,11 @@ const TotalRequests = ({ refresh, setRefresh }) => {
     useState(false);
   const [remarks, setRemarks] = useState("");
   const [statusValue, setStatusValue] = useState("");
-  const role = getUserData()?.role || "";
+  const currentUser = getUserData();
+  const role = currentUser?.role || "";
+  const assignedProjectIds = Array.isArray(currentUser?.user_projects)
+    ? currentUser.user_projects.map(getId).filter(Boolean).map(String)
+    : [];
   // Dropdown state for project filter
   const [selectedProject, setSelectedProject] = useState("");
   const [inspecForm, setInspecForm] = useState(false);
@@ -83,30 +90,50 @@ const TotalRequests = ({ refresh, setRefresh }) => {
   const queryKey = useMemo(() => ["requests", "list"], []);
   // Fetch requests
   const listQuery = useQuery({
-    queryKey: ["requests", type, status, selectedProject], // 👈 dynamic key
+    queryKey: [
+      "requests",
+      type,
+      status,
+      selectedProject,
+      role,
+      currentUser?._id,
+      assignedProjectIds.join(","),
+    ],
     queryFn: async () => {
-      const url =
-        selectedProject === ""
-          ? role === "consultant_rep"
-            ? `${API_URL}/main-form/status/${type}/${status}`
-            : `${API_URL}/main-form/status/${
-                type === "contractor_rep" ? "contractor" : type
-              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-                getUserData()._id
-              }`
-          : role === "consultant_rep"
-            ? `${API_URL}/main-form/status/${selectedProject}/${type}/${status}`
-            : `${API_URL}/main-form/status/${
-                type === "contractor_rep" ? "contractor" : type
-              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-                getUserData()._id
-              }`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : data.data || [];
+      let arr;
+      if (role === "consultant_rep") {
+        const projectIds = selectedProject
+          ? assignedProjectIds.includes(selectedProject)
+            ? [selectedProject]
+            : []
+          : assignedProjectIds;
+        const projectRequests = await Promise.all(
+          projectIds.map(async (projectId) => {
+            const res = await fetch(
+              `${API_URL}/main-form/status/${projectId}/${type}/${status}`,
+              {
+                method: "GET",
+                headers: { Authorization: `Bearer ${getToken()}` },
+              },
+            );
+            const data = await res.json();
+            return Array.isArray(data) ? data : data.data || [];
+          }),
+        );
+        arr = projectRequests.flat();
+      } else {
+        const url = `${API_URL}/main-form/status/${
+          type === "contractor_rep" ? "contractor" : type
+        }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+          currentUser._id
+        }`;
+        const res = await fetch(url, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        const data = await res.json();
+        arr = Array.isArray(data) ? data : data.data || [];
+      }
       return arr.map((r, i) => ({
         ...r,
         id: r.id || r._id || String(i + 1),
@@ -131,15 +158,29 @@ const TotalRequests = ({ refresh, setRefresh }) => {
     if (!listQuery.data || !projectsQuery.data) return [];
 
     return listQuery.data
-      .filter((r) => !selectedProject || r.project_id === selectedProject)
+      .filter((r) => {
+        const projectId = String(getId(r.project_id) || "");
+        if (role === "consultant_rep" && !assignedProjectIds.includes(projectId)) {
+          return false;
+        }
+        return !selectedProject || projectId === selectedProject;
+      })
       .map((r) => {
-        const project = projectsQuery.data.find((p) => p._id === r.project_id);
+        const project = projectsQuery.data.find(
+          (p) => String(getId(p._id || p.id)) === String(getId(r.project_id)),
+        );
         return {
           ...r,
           project_name: project ? project.project_title : "Unknown",
         };
       });
-  }, [listQuery.data, projectsQuery.data, selectedProject]);
+  }, [
+    listQuery.data,
+    projectsQuery.data,
+    selectedProject,
+    role,
+    assignedProjectIds.join(","),
+  ]);
   console.log(selectedRow);
   const columns = [
     { key: "sno", header: "#" },
@@ -389,10 +430,16 @@ const TotalRequests = ({ refresh, setRefresh }) => {
   }
   const options = [
     { value: "", label: "All Projects" }, // empty default option
-    ...(projectsQuery?.data?.map((proj) => ({
+    ...(projectsQuery?.data
+      ?.filter(
+        (proj) =>
+          role !== "consultant_rep" ||
+          assignedProjectIds.includes(String(getId(proj._id || proj.id))),
+      )
+      .map((proj) => ({
       value: proj._id,
       label: proj.project_title,
-    })) || []),
+      })) || []),
   ];
   // update Inspector status here
   async function handleSubmit(e) {
