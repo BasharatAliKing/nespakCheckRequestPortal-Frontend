@@ -68,7 +68,8 @@ const KpisCardDashboard = ({ refresh }) => {
   const [kpiConsultant, setKpiConsultant] = useState([]);
   const [kpiProjects, setKpiProjects] = useState([]);
   const [kpiMainForm, setKpiMainForm] = useState([]);
-  const role = getUserData()?.role || "Guest";
+  const user = getUserData() || {};
+  const role = user.role || "Guest";
   let statusData = [];
 
   if (role === "contractor_rep") {
@@ -614,12 +615,47 @@ const KpisCardDashboard = ({ refresh }) => {
   };
   const getKpisData = async () => {
     try {
+      if (role === "consultant_rep") {
+        const projectIds = [
+          ...new Set(
+            (Array.isArray(user.user_projects) ? user.user_projects : [])
+              .map((project) =>
+                project && typeof project === "object"
+                  ? project._id || project.id
+                  : project,
+              )
+              .filter(Boolean)
+              .map(String),
+          ),
+        ];
+        const projectKpis = await Promise.all(
+          projectIds.map(async (projectId) => {
+            const res = await fetch(
+              `${API_URL}/main-form/contractorkpis/${projectId}`,
+              {
+                method: "GET",
+                headers: { Authorization: `Bearer ${getToken()}` },
+              },
+            );
+            if (!res.ok) throw new Error("Failed to fetch project KPI data");
+            const data = await res.json();
+            return data.kpiData?.consultant || {};
+          }),
+        );
+        const consultantKpis = projectKpis.reduce((totals, projectKpi) => {
+          Object.entries(projectKpi).forEach(([key, value]) => {
+            totals[key] = (totals[key] || 0) + (Number(value) || 0);
+          });
+          return totals;
+        }, {});
+        setKpiData((current) => ({ ...current, consultant: consultantKpis }));
+        return;
+      }
+
       const url =
-        role === "consultant_rep"
-          ? `${API_URL}/main-form/contractorkpis`
-          : `${API_URL}/main-form/contractorkpis/${
-              role === "contractor_rep" ? "contractor" : role
-            }/${getUserData()._id}/`;
+        `${API_URL}/main-form/contractorkpis/${
+          role === "contractor_rep" ? "contractor" : role
+        }/${user._id}/`;
       const res = await fetch(url, {
         method: "GET",
         headers: {

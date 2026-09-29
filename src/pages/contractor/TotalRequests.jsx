@@ -11,8 +11,8 @@ import MainPageDesing from "../../components/MainPageDesing";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const getId = (value) =>
-  typeof value === "object" && value !== null ? value._id || value.id : value;
+const getEntityId = (value) =>
+  value && typeof value === "object" ? value._id || value.id : value;
 
 const Display = ({ label, value }) => (
   <div>
@@ -29,11 +29,15 @@ const TotalRequests = ({ refresh, setRefresh }) => {
     useState(false);
   const [remarks, setRemarks] = useState("");
   const [statusValue, setStatusValue] = useState("");
-  const currentUser = getUserData();
-  const role = currentUser?.role || "";
-  const assignedProjectIds = Array.isArray(currentUser?.user_projects)
-    ? currentUser.user_projects.map(getId).filter(Boolean).map(String)
-    : [];
+  const user = useMemo(() => getUserData() || {}, []);
+  const role = user.role || "";
+  const assignedProjectIds = useMemo(
+    () =>
+      Array.isArray(user.user_projects)
+        ? user.user_projects.map(getEntityId).filter(Boolean).map(String)
+        : [],
+    [user.user_projects],
+  );
   // Dropdown state for project filter
   const [selectedProject, setSelectedProject] = useState("");
   const [inspecForm, setInspecForm] = useState(false);
@@ -90,24 +94,14 @@ const TotalRequests = ({ refresh, setRefresh }) => {
   const queryKey = useMemo(() => ["requests", "list"], []);
   // Fetch requests
   const listQuery = useQuery({
-    queryKey: [
-      "requests",
-      type,
-      status,
-      selectedProject,
-      role,
-      currentUser?._id,
-      assignedProjectIds.join(","),
-    ],
+    queryKey: ["requests", type, status, selectedProject, user._id, assignedProjectIds],
     queryFn: async () => {
-      let arr;
       if (role === "consultant_rep") {
         const projectIds = selectedProject
-          ? assignedProjectIds.includes(selectedProject)
-            ? [selectedProject]
-            : []
+          ? assignedProjectIds.filter((id) => id === String(selectedProject))
           : assignedProjectIds;
-        const projectRequests = await Promise.all(
+
+        const requestsByProject = await Promise.all(
           projectIds.map(async (projectId) => {
             const res = await fetch(
               `${API_URL}/main-form/status/${projectId}/${type}/${status}`,
@@ -116,24 +110,37 @@ const TotalRequests = ({ refresh, setRefresh }) => {
                 headers: { Authorization: `Bearer ${getToken()}` },
               },
             );
+            if (!res.ok) throw new Error("Failed to fetch requests");
             const data = await res.json();
             return Array.isArray(data) ? data : data.data || [];
           }),
         );
-        arr = projectRequests.flat();
-      } else {
-        const url = `${API_URL}/main-form/status/${
-          type === "contractor_rep" ? "contractor" : type
-        }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-          currentUser._id
-        }`;
-        const res = await fetch(url, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        const data = await res.json();
-        arr = Array.isArray(data) ? data : data.data || [];
+
+        return requestsByProject.flat().map((r, i) => ({
+          ...r,
+          id: r.id || r._id || String(i + 1),
+          sno: i + 1,
+        }));
       }
+
+      const url =
+        selectedProject === ""
+          ? `${API_URL}/main-form/status/${
+                type === "contractor_rep" ? "contractor" : type
+              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+                user._id
+              }`
+          : `${API_URL}/main-form/status/${
+                type === "contractor_rep" ? "contractor" : type
+              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+                user._id
+              }`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : data.data || [];
       return arr.map((r, i) => ({
         ...r,
         id: r.id || r._id || String(i + 1),
@@ -159,15 +166,17 @@ const TotalRequests = ({ refresh, setRefresh }) => {
 
     return listQuery.data
       .filter((r) => {
-        const projectId = String(getId(r.project_id) || "");
-        if (role === "consultant_rep" && !assignedProjectIds.includes(projectId)) {
-          return false;
-        }
-        return !selectedProject || projectId === selectedProject;
+        const projectId = String(getEntityId(r.project_id) || "");
+        const isAssignedProject =
+          role !== "consultant_rep" || assignedProjectIds.includes(projectId);
+        return (
+          isAssignedProject &&
+          (!selectedProject || projectId === String(selectedProject))
+        );
       })
       .map((r) => {
         const project = projectsQuery.data.find(
-          (p) => String(getId(p._id || p.id)) === String(getId(r.project_id)),
+          (p) => String(getEntityId(p)) === String(getEntityId(r.project_id)),
         );
         return {
           ...r,
@@ -179,9 +188,8 @@ const TotalRequests = ({ refresh, setRefresh }) => {
     projectsQuery.data,
     selectedProject,
     role,
-    assignedProjectIds.join(","),
+    assignedProjectIds,
   ]);
-  console.log(selectedRow);
   const columns = [
     { key: "sno", header: "#" },
     { key: "rfi_no", header: "RFI No" },
@@ -428,18 +436,18 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       },
     });
   }
+  const visibleProjects =
+    role === "consultant_rep"
+      ? (projectsQuery.data || []).filter((project) =>
+          assignedProjectIds.includes(String(getEntityId(project))),
+        )
+      : projectsQuery.data || [];
   const options = [
     { value: "", label: "All Projects" }, // empty default option
-    ...(projectsQuery?.data
-      ?.filter(
-        (proj) =>
-          role !== "consultant_rep" ||
-          assignedProjectIds.includes(String(getId(proj._id || proj.id))),
-      )
-      .map((proj) => ({
-      value: proj._id,
+    ...visibleProjects.map((proj) => ({
+      value: getEntityId(proj),
       label: proj.project_title,
-      })) || []),
+    })),
   ];
   // update Inspector status here
   async function handleSubmit(e) {

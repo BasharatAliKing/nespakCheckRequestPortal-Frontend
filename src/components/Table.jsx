@@ -8,7 +8,7 @@ export default function Table({ columns, rows, onEdit, onDelete, onView, searchK
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
- console.log(columns);
+
   // Filter rows by searchKey
   const filteredRows = useMemo(() => {
     if (!searchKey || !search) return rows
