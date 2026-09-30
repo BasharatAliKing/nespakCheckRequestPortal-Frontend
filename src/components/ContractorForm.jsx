@@ -4,11 +4,24 @@ import { getToken, getUserData } from "../utilities/auth";
 import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const API_IMG = import.meta.env.VITE_API_BASE_IMG;
 
 const ContractorForm = ({ onClose, data, mode = "create" }) => {
   const [listProjects, setListProjects] = useState([]);
   const [listMainForm, setListMainForm] = useState([]);
-  const [boqType, setBoqType] = useState("boq"); // "boq" | "nonboq"
+  const [boqType, setBoqType] = useState(() =>
+    data?.non_boq_item ? "nonboq" : "boq",
+  );
+  const [existingContractorAttachments, setExistingContractorAttachments] =
+    useState(() =>
+      Array.isArray(data?.contractor_attachments)
+        ? data.contractor_attachments.filter(
+            (attachment) => attachment?.file_path,
+          )
+        : [],
+    );
+  const [removedContractorAttachments, setRemovedContractorAttachments] =
+    useState([]);
   const [contractorAttachments, setContractorAttachments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formDate, setFormDate] = useState({
@@ -185,63 +198,117 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
     const now = new Date();
+
     const submitDate = now.toISOString().split("T")[0];
 
     let hours = now.getHours();
+
     const min = String(now.getMinutes()).padStart(2, "0");
+
     const ampm = hours >= 12 ? "PM" : "AM";
 
     hours = hours % 12;
     hours = hours ? hours : 12;
 
     const hh = String(hours).padStart(2, "0");
+
     const submitTime = `${hh}:${min} ${ampm}`;
 
     try {
       const formData = new FormData();
 
+      // -----------------------------
+      // NORMAL DATA
+      // -----------------------------
+
       Object.entries(formDate).forEach(([key, value]) => {
         if (
-          key !== "contractor_submit_date" &&
-          key !== "contractor_submit_time"
+          key === "contractor_submit_date" ||
+          key === "contractor_submit_time"
         ) {
-          formData.append(key, value ?? "");
+          return;
         }
+
+        formData.append(key, value ?? "");
       });
+
+      // -----------------------------
+      // OTHER DATA
+      // -----------------------------
 
       formData.append("selected_contractor", getUserData()._id);
+
       formData.append("contractor_submit_date", submitDate);
+
       formData.append("contractor_submit_time", submitTime);
 
+      formData.append("contractor_status", "pending");
+
+      formData.append("consultant_status", "pending");
+
+      // -----------------------------
+      // REMOVED OLD ATTACHMENTS
+      // -----------------------------
+
+      formData.append(
+        "removed_contractor_attachments",
+        JSON.stringify(removedContractorAttachments),
+      );
+
+      // -----------------------------
+      // NEW ATTACHMENTS
+      // -----------------------------
+
       contractorAttachments.forEach((file) => {
         formData.append("contractor_attachments", file);
       });
 
-      // Multiple attachments
-      contractorAttachments.forEach((file) => {
-        formData.append("contractor_attachments", file);
-      });
+      // -----------------------------
+      // DEBUG
+      // -----------------------------
+
+      console.log("Removed attachments:", removedContractorAttachments);
+
+      console.log("New attachments:", contractorAttachments);
+
+      // -----------------------------
+      // API
+      // -----------------------------
 
       const res = await fetch(`${API_URL}/main-form/${data._id}`, {
         method: "PUT",
+
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
+
         body: formData,
       });
 
       const result = await res.json();
 
+      console.log("UPDATE RESPONSE:", result);
+
       if (!res.ok) {
         toast.error(result.message || "Update failed");
-      } else {
-        toast.success("RFI updated successfully");
-        onClose();
+
+        return;
       }
+
+      toast.success("RFI updated successfully");
+
+      onClose();
     } catch (err) {
-      console.log(err);
+      console.error("Update Error:", err);
+
       toast.error("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -443,7 +510,10 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
                   name="boqType"
                   value="boq"
                   checked={boqType === "boq"}
-                  onChange={(e) => setBoqType(e.target.value)}
+                  onChange={() => {
+                    setBoqType("boq");
+                    setFormDate((prev) => ({ ...prev, non_boq_item: "" }));
+                  }}
                   className="cursor-pointer"
                 />
                 BOQ Item
@@ -454,7 +524,10 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
                   name="boqType"
                   value="nonboq"
                   checked={boqType === "nonboq"}
-                  onChange={(e) => setBoqType(e.target.value)}
+                  onChange={() => {
+                    setBoqType("nonboq");
+                    setFormDate((prev) => ({ ...prev, boq_item_no: "" }));
+                  }}
                   className="cursor-pointer"
                 />
                 Non BOQ Item
@@ -508,43 +581,161 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
             />
           </div>
           {/* Contractor Attachments */}
-          <div className="col-span-2 space-y-2">
-            <label className="text-sm font-medium">Attachments</label>
+          <div className="col-span-2 space-y-3">
 
-            <input
-              type="file"
-              multiple
-              onChange={(e) => {
-                setContractorAttachments(Array.from(e.target.files));
-              }}
-              className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
+  <label className="text-sm font-medium">
+    {mode === "edit"
+      ? "Add / Manage Attachments"
+      : "Attachments"}
+  </label>
 
-            {contractorAttachments.length > 0 && (
-              <div className="space-y-1 mt-2">
-                {contractorAttachments.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded"
-                  >
-                    <span className="text-sm truncate">{file.name}</span>
+  {/* FILE SELECT */}
+  <input
+    type="file"
+    multiple
+    onChange={(e) => {
+      const selectedFiles = Array.from(e.target.files || []);
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setContractorAttachments((prev) =>
-                          prev.filter((_, i) => i !== index),
-                        );
-                      }}
-                      className="text-red-500 text-sm ml-3"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+      if (selectedFiles.length === 0) return;
+
+      setContractorAttachments((prev) => [
+        ...prev,
+        ...selectedFiles,
+      ]);
+
+      // allow selecting same file again
+      e.target.value = "";
+    }}
+    className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {/* ============================= */}
+  {/* EXISTING / SAVED ATTACHMENTS */}
+  {/* ============================= */}
+
+  {mode === "edit" &&
+    existingContractorAttachments.length > 0 && (
+      <div className="space-y-2">
+
+        <p className="text-sm font-semibold text-gray-700">
+          Existing Attachments
+        </p>
+
+        {existingContractorAttachments.map(
+          (attachment, index) => (
+            <div
+              key={
+                attachment._id ||
+                attachment.file_path ||
+                index
+              }
+              className="flex items-center justify-between gap-3 bg-gray-100 border rounded px-3 py-2"
+            >
+              <a
+                href={`${API_IMG || ""}${attachment.file_path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-w-0 truncate text-sm text-blue-600 hover:underline"
+              >
+                📎 Attachment {index + 1}
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  // Remove from UI
+                  setExistingContractorAttachments(
+                    (prev) =>
+                      prev.filter(
+                        (item) =>
+                          item.file_path !==
+                          attachment.file_path
+                      )
+                  );
+
+                  // Mark for backend deletion
+                  setRemovedContractorAttachments(
+                    (prev) =>
+                      prev.includes(
+                        attachment.file_path
+                      )
+                        ? prev
+                        : [
+                            ...prev,
+                            attachment.file_path,
+                          ]
+                  );
+                }}
+                className="shrink-0 text-sm text-red-600 hover:text-red-800"
+              >
+                Remove
+              </button>
+            </div>
+          )
+        )}
+      </div>
+    )}
+
+  {/* ============================= */}
+  {/* NEW SELECTED ATTACHMENTS */}
+  {/* ============================= */}
+
+  {contractorAttachments.length > 0 && (
+    <div className="space-y-2">
+
+      <p className="text-sm font-semibold text-green-700">
+        New Attachments
+      </p>
+
+      {contractorAttachments.map((file, index) => (
+        <div
+          key={`${file.name}-${file.lastModified}-${index}`}
+          className="flex items-center justify-between gap-3 bg-green-50 border border-green-200 rounded px-3 py-2"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+
+            <span>📎</span>
+
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-700">
+                Attachment {index + 1}
+              </p>
+
+              <p className="text-xs text-gray-500 truncate">
+                {file.name}
+              </p>
+            </div>
+
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setContractorAttachments(
+                (prev) =>
+                  prev.filter(
+                    (_, i) => i !== index
+                  )
+              );
+            }}
+            className="shrink-0 text-sm text-red-600 hover:text-red-800"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {/* NOTHING */}
+  {mode === "edit" &&
+    existingContractorAttachments.length === 0 &&
+    contractorAttachments.length === 0 && (
+      <p className="text-sm text-gray-400">
+        No attachments
+      </p>
+    )}
+</div>
           <div className="col-span-2 flex gap-3">
             {mode === "create" && (
               <button
@@ -566,14 +757,26 @@ const ContractorForm = ({ onClose, data, mode = "create" }) => {
                 )}
               </button>
             )}
-            {mode === "edit" && (
-              <button
-                type="submit"
-                className="cursor-pointer bg-green-600 text-white p-2 rounded w-full"
-              >
-                Update
-              </button>
-            )}
+           {mode === "edit" && (
+  <button
+    type="submit"
+    disabled={isSubmitting}
+    className={`text-white p-2 rounded w-full flex items-center justify-center gap-2 ${
+      isSubmitting
+        ? "bg-green-400 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 cursor-pointer"
+    }`}
+  >
+    {isSubmitting ? (
+      <>
+        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+        Updating...
+      </>
+    ) : (
+      "Update"
+    )}
+  </button>
+)}
           </div>
         </div>
       </form>

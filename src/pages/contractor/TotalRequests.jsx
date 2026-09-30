@@ -10,6 +10,7 @@ import UpdateConsAfterRe from "../../components/UpdateConsAfterRe";
 import MainPageDesing from "../../components/MainPageDesing";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const API_IMG = import.meta.env.VITE_API_BASE_IMG;
 
 const getEntityId = (value) =>
   value && typeof value === "object" ? value._id || value.id : value;
@@ -94,7 +95,14 @@ const TotalRequests = ({ refresh, setRefresh }) => {
   const queryKey = useMemo(() => ["requests", "list"], []);
   // Fetch requests
   const listQuery = useQuery({
-    queryKey: ["requests", type, status, selectedProject, user._id, assignedProjectIds],
+    queryKey: [
+      "requests",
+      type,
+      status,
+      selectedProject,
+      user._id,
+      assignedProjectIds,
+    ],
     queryFn: async () => {
       if (role === "consultant_rep") {
         const projectIds = selectedProject
@@ -126,15 +134,15 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       const url =
         selectedProject === ""
           ? `${API_URL}/main-form/status/${
-                type === "contractor_rep" ? "contractor" : type
-              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-                user._id
-              }`
+              type === "contractor_rep" ? "contractor" : type
+            }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+              user._id
+            }`
           : `${API_URL}/main-form/status/${
-                type === "contractor_rep" ? "contractor" : type
-              }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
-                user._id
-              }`;
+              type === "contractor_rep" ? "contractor" : type
+            }/${status}/${role === "contractor_rep" ? "contractor" : role}/${
+              user._id
+            }`;
       const res = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -876,7 +884,17 @@ const TotalRequests = ({ refresh, setRefresh }) => {
                 />
                 <Display label="Location" value={selectedRow?.location} />
                 <Display label="Bill No" value={selectedRow?.bill_no} />
-                <Display label="BOQ Item No" value={selectedRow?.boq_item_no} />
+                {selectedRow?.boq_item_no ? (
+                  <Display
+                    label="BOQ Item No"
+                    value={selectedRow.boq_item_no}
+                  />
+                ) : (
+                  <Display
+                    label="Non BOQ Item"
+                    value={selectedRow?.non_boq_item}
+                  />
+                )}
                 <Display
                   label="Drawing Ref No"
                   value={selectedRow?.drawing_ref_no}
@@ -893,6 +911,34 @@ const TotalRequests = ({ refresh, setRefresh }) => {
                   label="Contractor Submit Time"
                   value={selectedRow?.contractor_submit_time || "—"}
                 />
+                <div className="md:col-span-3">
+                  <p className="text-sm font-medium text-gray-600 mb-2">
+                    Contractor Attachments
+                  </p>
+
+                  {selectedRow?.contractor_attachments?.length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {selectedRow.contractor_attachments.map(
+                        (attachment, index) => (
+                          <a
+                            key={attachment._id || index}
+                            href={`${API_IMG}${attachment.file_path}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-2 bg-white border rounded-md hover:bg-gray-100 transition"
+                          >
+                            📎
+                            <span className="text-sm text-blue-600">
+                              Attachment {index + 1}
+                            </span>
+                          </a>
+                        ),
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-400">No attachments</p>
+                  )}
+                </div>
               </div>
             )}
             {/* ------------------------------------------------------------------ */}
