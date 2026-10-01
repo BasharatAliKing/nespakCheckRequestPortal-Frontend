@@ -52,8 +52,24 @@ const TotalRequests = ({ refresh, setRefresh }) => {
     selectARE: "",
     selectRE: "",
   });
+  const selectedRequestProjectId = String(
+    getEntityId(selectedRow?.project_id) || "",
+  );
+  const projectUsers = useMemo(
+    () =>
+      users.filter(
+        (user) =>
+          selectedRequestProjectId &&
+          Array.isArray(user.user_projects) &&
+          user.user_projects.some(
+            (project) =>
+              String(getEntityId(project)) === selectedRequestProjectId,
+          ),
+      ),
+    [users, selectedRequestProjectId],
+  );
   const optionsInspector = [
-    ...users
+    ...projectUsers
       .filter((user) => user.role === "inspector")
       .map((user) => ({
         value: user._id,
@@ -61,7 +77,7 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       })),
   ];
   const optionsSurveyor = [
-    ...users
+    ...projectUsers
       .filter((user) => user.role === "surveyor")
       .map((user) => ({
         value: user._id,
@@ -69,7 +85,7 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       })),
   ];
   const optionsMe = [
-    ...users
+    ...projectUsers
       .filter((user) => user.role === "me")
       .map((user) => ({
         value: user._id,
@@ -77,7 +93,7 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       })),
   ];
   const optionsAre = [
-    ...users
+    ...projectUsers
       .filter((user) => user.role === "are")
       .map((user) => ({
         value: user._id,
@@ -85,7 +101,7 @@ const TotalRequests = ({ refresh, setRefresh }) => {
       })),
   ];
   const optionsRe = [
-    ...users
+    ...projectUsers
       .filter((user) => user.role === "re")
       .map((user) => ({
         value: user._id,
@@ -834,13 +850,22 @@ const TotalRequests = ({ refresh, setRefresh }) => {
             {/* HEADER + REVERT BUTTON */}
             <div className="flex justify-between items-center border-b pb-2">
               <h3 className="text-xl font-semibold">Update Check Request</h3>
-              <button
+             <div className="flex gap-2">
+               <button
                 type="button"
                 onClick={() => setRevertMode(!revertMode)}
-                className="px-3 py-1 bg-red-600 text-white rounded-md text-sm"
+                className="px-3 py-1 cursor-pointer bg-red-600 text-white rounded-md text-sm"
               >
                 {revertMode ? "Cancel Revert" : "Revert"}
               </button>
+              <button
+                type="button"
+                onClick={() => setShowConsultantForm(false)}
+                className="px-3 py-1 cursor-pointer bg-blue-600 text-white rounded-md text-sm"
+              >
+               Close
+              </button>
+             </div>
             </div>
             {/* ------------------------------------------------------------------ */}
             {/* VIEW API FIELDS (HIDDEN IN REVERT MODE) */}
