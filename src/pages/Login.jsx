@@ -112,7 +112,7 @@ const [showPassword, setShowPassword] = useState(false)
    </div>
       </form>
     </div>
-    <img src="/man.png" className='absolute bottom-0 left-5 opacity-60' width="10%" alt="" />
+    <img src="/man.png" className='absolute bottom-0 left-5 opacity-60' width="12%" alt="" />
     <img src="/nespakloginlogo.png" width="20%"  className='absolute bottom-5 right-5' alt="" />
      </div>
   )
